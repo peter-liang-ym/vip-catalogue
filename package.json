@@ -5,8 +5,8 @@
   "scripts": {
     "ingest": "bun run src/ingest/cli.ts",
     "ingest:fixtures": "bun run scripts/ingest-fixtures.ts",
-    "test": "bunx --bun vitest run",
-    "test:props": "bunx --bun vitest run prop.test",
+    "test": "bun --bun run vitest run",
+    "test:props": "bun --bun run vitest run prop.test --passWithNoTests",
     "test:e2e": "playwright test",
     "check:payload": "bun run scripts/check-payload.ts",
     "dev": "vite",

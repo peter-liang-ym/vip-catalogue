@@ -1,7 +1,9 @@
 import { defineConfig } from 'vitest/config';
 
 // Vitest is the test runner and is executed under the Bun runtime
-// (`bunx --bun vitest run`), never through `bun test`.
+// (`bun run test`, i.e. `bun --bun run vitest run`), never through `bun test`.
+// Do not use `bunx --bun vitest run`: on Windows, bunx misparses the worker
+// execArgv Vitest passes to forked children and no tests execute.
 //
 // Conventions:
 // - Unit tests:     `*.test.ts` / `*.test.tsx`
