@@ -1,0 +1,140 @@
+<!doctype html>
+<!--
+  SYNTHETIC FIXTURE — hand-authored, never written by `bun run ingest:fixtures`.
+
+  This page imitates the Source_Site's entry markup after a plausible round of
+  drift, so the parser's degradation paths are pinned by a file rather than by a
+  generator. Every team, advisor, sponsor, and course reference below is invented.
+
+  Parse against sourceUrl `https://vip.gatech.edu/teams/entry/99001`.
+
+  Drift it carries, and the behavior each one is here to pin:
+
+  1. Renamed headings with no documented alternate
+     - `Project Goals`                      -> goals is '' and an omission names the missing section
+     - `Preferred Interests & Preparation`  -> preferredInterests is '' and an omission names it
+     (Requirement 2.7)
+
+  2. Documented alternates, which must still resolve
+     - `Issues Addressed`, `Partners and Sponsors`, `Advisor` (singular),
+       `Day, Time and Location`
+
+  3. A reordered section
+     - the advisor section comes first, ahead of every other section, because
+       lookup is heading-anchored and not positional
+
+  4. A majors line with no colon
+     - `Computing and Sciences all in one line with no separator` is skipped and
+       recorded, while the two well-formed lines still parse (Requirement 2.10 on
+       the report side, Requirement 2.2 on the record side)
+
+  5. An advisor block with no mail link
+     - Dr. Ben Sample sits between two mail-linked blocks, so the entry is kept
+       with an empty email and recorded (Requirement 2.10)
+
+  6. An unidentifiable meeting component
+     - the meeting line names a weekday and a location but no clock time, so the
+       time value is empty, the day and location survive, and the Meeting_Window
+       degrades to unavailable (Requirement 2.11)
+
+  7. Broken tags
+     - an unclosed `<p>` around the second advisor, unclosed `<li>` elements, a
+       stray `</span>` with no opener, and an unquoted attribute value, all of
+       which the parser must tolerate
+     - deliberately no unclosed inline formatting tag (`<strong>`, `<em>`) before
+       the last section: the HTML adoption agency algorithm re-nests every later
+       element inside it, which would make this fixture assert on a parse quirk
+       instead of on parser behavior
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Drifted Fixture Team | Vertically Integrated Projects</title>
+  </head>
+  <body class="page-template-teams single-entry">
+    <header class="site-header">
+      <a href="/">Vertically Integrated Projects</a>
+      <img src="/wp-content/themes/vip/images/logo.png" alt="Site logo" />
+    </header>
+
+    <main>
+      <div id="content">
+        <h1>Drifted Fixture Team</h1>
+
+        <img
+          src="/wp-content/uploads/2026/01/drifted-fixture-header.jpg"
+          alt="Students assembling a test rig"
+        />
+
+        <!-- Reordered: on the live site this section sits near the bottom. -->
+        <h4>Advisor</h4>
+        <p>
+          Dr. Ada Placeholder<br />
+          School of Electrical and Computer Engineering<br />
+          <a href="mailto:ada.placeholder@example.gatech.edu"
+            >ada.placeholder@example.gatech.edu</a
+          >
+        </p>
+        <p>
+          Dr. Ben Sample<br />
+          School of Materials Science and Engineering
+        <p>
+          Dr. Cleo Stand-In<br />
+          School of Physics<br />
+          <a href="mailto:cleo.standin@example.gatech.edu"
+            >cleo.standin@example.gatech.edu</a
+          >
+        </p>
+
+        <!-- Renamed: `Goals` on the live site. -->
+        <h4>Project Goals</h4>
+        <p>
+          Build a bench-scale rig that measures how invented composite panels
+          respond to repeated thermal cycling.
+        </p>
+
+        <!-- Documented alternate for `Issues Involved or Addressed`. -->
+        <h4>Issues Addressed</h4>
+        <p class=broken><strong>Panel fatigue</strong></span> is expensive to characterize, and small teams rarely get instrument time.</p>
+
+        <!-- Documented alternate for `Partners/Sponsors`. -->
+        <h4>Partners and Sponsors</h4>
+        <p>Example Materials Cooperative</p>
+
+        <h4>Methods and Technologies</h4>
+        <ul>
+          <li>Thermal cycling chamber
+          <li>Strain gauge instrumentation
+          <li>Data logging in Python
+        </ul>
+
+        <h4>Majors Sought</h4>
+        <p>
+          Engineering: Electrical Engineering, Mechanical Engineering<br />
+          Computing and Sciences all in one line with no separator<br />
+          Sciences: Physics
+        </p>
+
+        <!-- Renamed: `and` replaced with `&`, which is not a documented alternate. -->
+        <h4>Preferred Interests &amp; Preparation</h4>
+        <p>Coursework in materials or controls, or comparable hands-on work.</p>
+
+        <!-- Documented alternate for `Day, Time &amp; Location`. -->
+        <h4>Day, Time and Location</h4>
+        <p>Full Team Meeting: Wednesday, time to be announced, Klaus 1116</p>
+
+        <!-- Outside the schema: must leave no trace in the record. -->
+        <h4>Link(s)</h4>
+        <p>
+          <a href="https://example.gatech.edu/drifted-fixture-team"
+            >Team site</a
+          >
+        </p>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>Georgia Institute of Technology</p>
+    </footer>
+  </body>
+</html>
