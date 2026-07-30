@@ -1,0 +1,9 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+
+# Intermediate file written by the publish store before its atomic rename.
+public/dataset.json.tmp
+
+.kiro/
