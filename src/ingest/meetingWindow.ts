@@ -113,6 +113,15 @@ function scanWeekdays(dayText: string): WeekdayScan {
   };
 }
 
+/**
+ * The distinct weekdays named in `text`, in Monday..Sunday order. Exported so the
+ * day facet reads weekdays out of the meeting day text with the same accepted
+ * spellings the Meeting_Window derivation uses (Requirement 6.2).
+ */
+export function weekdaysInText(text: string): readonly Weekday[] {
+  return scanWeekdays(text).weekdays;
+}
+
 /** `null` when the captured text is not a clock time (hour past 23, minute past 59). */
 function toClock(
   hourText: string | undefined,
