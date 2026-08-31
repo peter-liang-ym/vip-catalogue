@@ -1,0 +1,176 @@
+{
+  "runStartedAt": "2026-08-31T19:17:34.870Z",
+  "runEndedAt": "2026-08-31T19:21:36.984Z",
+  "indexUrlUsed": "https://vip.gatech.edu/teams-all-in-one/",
+  "discoveredUrlCount": 110,
+  "recordCount": 110,
+  "failedUrls": [],
+  "parseErrors": [],
+  "omissions": [
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/2472",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1259",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1342",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1289",
+      "detail": "meeting window unavailable (noEndTime): day=\"Friday\" time=\"1:30pm\""
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1281",
+      "detail": "meeting window unavailable (noEndTime): day=\"Monday\" time=\"8:00pm\""
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1275",
+      "detail": "unidentified meeting values: day"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1275",
+      "detail": "meeting window unavailable (noWeekday): day=\"\" time=\"12:30 – 1:20pm\""
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1296",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/2584",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1334",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1312",
+      "detail": "advisor with no email: Aaron McDaniel"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1318",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1318",
+      "detail": "advisor with no email: Alex Channell"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1284",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1284",
+      "detail": "meeting window unavailable (noEndTime): day=\"Wednesday\" time=\"2:00pm\""
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1278",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1254",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1253",
+      "detail": "empty section: majorsSought"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1242",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1326",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1241",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/14094",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1327",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/4144",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1308",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1262",
+      "detail": "meeting window unavailable (noEndTime): day=\"Wednesday\" time=\"7:00pm\""
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/10607",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/2480",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/14357",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/7917",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1349",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1349",
+      "detail": "empty section: majorsSought"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/3093",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1331",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1298",
+      "detail": "empty section: majorsSought"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1309",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/8335",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/3340",
+      "detail": "missing section: partnersSponsors"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/3340",
+      "detail": "unidentified meeting values: day, time"
+    },
+    {
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/3340",
+      "detail": "meeting window unavailable (noWeekday, noStartTime, noEndTime): day=\"\" time=\"\""
+    }
+  ],
+  "validationFailures": [],
+  "imageFailures": [],
+  "previousRecordCount": 2,
+  "published": true,
+  "exitCode": 0
+}
