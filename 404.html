@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      The static-host fallback for a path the host has no file for, which is every
+      /team/{id} deep link. It loads the same shell as index.html, and the shell
+      routes on the address it was loaded with, so the detail view renders without
+      a redirect. Kept as a second build input rather than a copy in `public/` so
+      it references the same hashed assets as index.html.
+    -->
+    <base href="/" />
+    <title>VIP Teams Mirror (unofficial)</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/client/main.tsx"></script>
+  </body>
+</html>

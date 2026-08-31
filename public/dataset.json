@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "2",
+  "generatedAt": "2026-08-31T16:39:43Z",
+  "teamCount": 2,
+  "teams": [
+    {
+      "entryId": "1248",
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/1248",
+      "name": "2D Heterostructure Synthesis",
+      "imageUrl": "https://vip.gatech.edu/files/formidable/18/2025-10-31/2D-Heterostructure-Synthesis.Resized-Pic-1-c6bc52-300x224.png",
+      "imagePath": "images/1248.png",
+      "imageAlt": "Large scientific laboratory instrument with metal chambers, tubes, and wiring.",
+      "goals": "To develop 2-D to 2-D tunneling structures to enable for smaller, faster, more capable microelectronic devices applied to a broad range of applications such as energy, RF, and sensing.",
+      "issuesAddressed": "GT has a unique opportunity to apply significant experience and capability in Molecular Beam Epitaxy within GTRI (Wagner) to the synthesis of novel 2-D materials being studied within the Vogel group. This vertically integrated project (VIP) will synthesize large area 2-D materials (e.g., MoS2 and WS2) and device structures using thin film deposition and microfabrication techniques. The impact of synthesis conditions (e.g., plasma assist, source materials, and temperatures) on crystal structure will be studied using techniques such as SEM, XRD, XPS, and Raman. These materials structures will then be fabricated into 2D-to-2D tunnel junctions and TFETs using microfabrication processes (e.g. photolithography, interlayer dielectrics, metallization, etc.). Once fabricated, detailed electrical characterization of these devices will be carried out, utilizing conventional (current-voltage, capacitance voltage, etc.) and specialized (e.g. inelastic tunneling spectroscopy) techniques.",
+      "partnersSponsors": "MKS Instruments, DTRA",
+      "methodsTechnologies": "",
+      "majorsSought": [],
+      "preferredInterests": "",
+      "advisors": [],
+      "meeting": {
+        "day": "",
+        "time": "",
+        "location": ""
+      },
+      "meetingWindow": null
+    },
+    {
+      "entryId": "14350",
+      "sourceUrl": "https://vip.gatech.edu/teams/entry/14350",
+      "name": "AA-NEW TEAM: Tactile Media Alliance",
+      "imageUrl": "https://vip.gatech.edu/files/formidable/18/2026-02-16/Student-Competition-Fidget-Group-81d9fd-300x198.png",
+      "imagePath": "images/14350.png",
+      "imageAlt": "",
+      "goals": "A collaborative hub advancing touch-based, physical–digital interactions through shared knowledge and tools.\n\nOur goal is to grow the founding Georgia Tech chapter of the Tactile Media Alliance into a campus hub for tactile media research, teaching, and collaboration, in partnership with the Tactile Technology Lab, CIDI’s AT-Network.Net, and national and international collaborators. Through this work, students help build the shared infrastructure that makes tactile media research and practice more sustainable, including reusable tactile techniques, accessible platforms for sharing tactile media, and strong practices for documentation, accessibility, onboarding, facilitation, and collaboration. The program also creates opportunities to gain hands-on experience in design research, prototyping, fabrication, accessibility, and human-centered design while contributing to innovation in tactile media hardware, interfaces, interaction techniques, and support for non-visual making.",
+      "issuesAddressed": "Touch shapes how people learn, navigate, and build skill, yet most digital systems still prioritize sight and sound. This team develops tactile media—interactive experiences that communicate through texture, vibration, force, compliance, shape-change, and physical manipulation. Because tactile perception is active, exploratory, and context-dependent, touch cannot be treated as a simple add-on to a finished interface (Gibson, 1962; Lederman & Klatzky, 1987). Tactile interaction is also difficult to design and evaluate, since small changes in materials, fabrication tolerances, sensing and actuation limits, and perceptual thresholds can significantly alter what users feel (Burdea, 1996; Hayward et al., 2004). Many ideas therefore stall as fragile prototypes, hard-to-compare results, or documentation that others cannot reproduce (Stangl et al., 2019; Suzuki et al., 2017). These challenges reflect broader problems of practice, including the stigma of touch, limited opportunities for tactile learning and participation, uneven access to tools and materials, unstable design resources, and weak pathways for sharing methods and expertise (Stangl et al., 2019). This VIP works to make touch a first-class medium for accessible, learnable, and meaningful interaction while building shared infrastructure that helps future teams move faster and with greater rigor. It also addresses the need for stronger trade pathways, professional networks, and communities of practice that can support non-visual making, tactile media production, and long-term field-building. The work grows Georgia Tech’s chapter of the Tactile Media Alliance (TMA) and the Tactile Technology Lab into a durable community of practice and a reliable production engine for tactile interaction research. Communities of practice matter here because they stabilize shared language, tools, and quality criteria, preserve expertise as projects change, and support continuous improvement through critique and mentorship (Lave & Wenger, 1991; Wenger, 1998). These functions strengthen both research quality and pathways into practice across design, engineering, accessibility, education, and creative technology. Students work across the full pipeline from concept to evidence. They co-design with blind and low-vision partners, prototype tactile artifacts through analog and digital fabrication, build embedded sensing and actuation systems, design interaction techniques, run accessibility-informed evaluations, and produce artifact records with material annotations, design rationales, and reusable protocols. They also contribute to the sociotechnical infrastructure that supports continuity in this work, including documentation practices, reusable techniques, collaboration structures, and networks that connect research to professional practice and emerging trade knowledge around non-visual making. Projects often serve as boundary objects across design, engineering, learning sciences, perception, and accessibility, and across settings such as education, museums, assistive technology, and public environments (Star & Griesemer, 1989). Over time, this approach supports cumulative science and transfer by producing comparable measures, reusable templates, and evidence-based guidelines that make tactile interaction easier to build, study, and deploy (Dourish, 2001; Wenger, 1998).",
+      "partnersSponsors": "Center for Inclusive Design and Innovation, Tools for Life, 100+ TMA members",
+      "methodsTechnologies": "",
+      "majorsSought": [],
+      "preferredInterests": "",
+      "advisors": [],
+      "meeting": {
+        "day": "",
+        "time": "",
+        "location": ""
+      },
+      "meetingWindow": null
+    }
+  ]
+}
