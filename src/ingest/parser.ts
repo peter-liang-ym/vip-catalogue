@@ -3,7 +3,11 @@
  *
  * Extraction is heading-anchored: a section is located by its heading text, not by
  * its position or its generated wrapper class, so a reordered page still parses and
- * a renamed heading degrades to one empty field rather than a wrong one. The
+ * a renamed heading degrades to one empty field rather than a wrong one. A body is
+ * found in both layouts the Source_Site uses — the heading followed by its content,
+ * and the heading alone in one grid column with its content in the column beside it
+ * — by `bodyAnchor`, which climbs to the nearest ancestor that has a following
+ * sibling. The
  * documented heading alternates (`Issues Addressed`, `Partners and Sponsors`,
  * `Advisor` singular, `Day, Time and Location`) are accepted, and sections outside
  * the schema (`Link(s)`) are ignored.
@@ -127,9 +131,57 @@ function resolveContent($: CheerioApi): Selection {
 }
 
 /**
- * Section body: the sibling nodes following the heading, up to the next heading of
- * the same or higher rank. Returns the raw HTML per located section; a section that
- * is absent has no entry.
+ * Whether this sibling begins the next section, and so ends the current one.
+ *
+ * A sibling that is itself a heading of the same or higher rank ends the section,
+ * which is the flat shape's rule. So does a sibling that *contains* such a heading
+ * naming a section, which is what stops a column-laid-out section at the next
+ * section's row instead of letting it absorb the rest of the page.
+ */
+function startsNextSection(sibling: Selection, rank: number): boolean {
+  const ownRank = headingRank(sibling);
+  if (ownRank !== null) return ownRank <= rank;
+
+  const nested = sibling.find(HEADINGS);
+  for (let i = 0; i < nested.length; i += 1) {
+    const heading = nested.eq(i);
+    if ((headingRank(heading) ?? 6) > rank) continue;
+    if (sectionKeyOf(heading.text()) !== null) return true;
+  }
+
+  return false;
+}
+
+/**
+ * The element whose following siblings hold a section's body.
+ *
+ * Usually the heading itself: `<h4>Goals</h4><p>…</p>` puts the heading and its body
+ * in one parent. But the Source_Site also lays a section out in two columns, where
+ * the heading is the only child of the first column and the body is the column
+ * beside it — a sibling of the heading's *parent*, not of the heading. Climbing to
+ * the nearest ancestor that has a following sibling locates the body in both shapes
+ * while staying blind to the wrapper classes the theme generates, so extraction
+ * stays anchored to the heading text rather than to a generated class name.
+ *
+ * The climb stops at `$content`, so a section with genuinely nothing after it stays
+ * empty rather than claiming the remainder of the page.
+ */
+function bodyAnchor($content: Selection, heading: Selection): Selection {
+  let node = heading;
+
+  while (node.nextAll().length === 0) {
+    const parent = node.parent();
+    if (parent.length === 0 || parent.is($content)) return heading;
+    node = parent;
+  }
+
+  return node;
+}
+
+/**
+ * Section body: the sibling nodes following the section's body anchor, up to the
+ * sibling that begins the next section. Returns the raw HTML per located section; a
+ * section that is absent has no entry.
  */
 function sectionBodies(
   $: CheerioApi,
@@ -144,13 +196,12 @@ function sectionBodies(
     if (key === null || bodies.has(key)) continue;
 
     const rank = headingRank(heading) ?? 6;
-    const siblings = heading.nextAll();
+    const siblings = bodyAnchor($content, heading).nextAll();
     const parts: string[] = [];
 
     for (let j = 0; j < siblings.length; j += 1) {
       const sibling = siblings.eq(j);
-      const siblingRank = headingRank(sibling);
-      if (siblingRank !== null && siblingRank <= rank) break;
+      if (startsNextSection(sibling, rank)) break;
       parts.push($.html(sibling));
     }
 

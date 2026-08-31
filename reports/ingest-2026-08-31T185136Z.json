@@ -1,0 +1,461 @@
+{
+  "runStartedAt": "2026-08-31T18:51:36.777Z",
+  "runEndedAt": "2026-08-31T18:51:37.440Z",
+  "indexUrlUsed": "https://vip.gatech.edu/teams-all-in-one/",
+  "discoveredUrlCount": 111,
+  "recordCount": 2,
+  "failedUrls": [
+    {
+      "url": "https://vip.gatech.edu/teams/entry/2472",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1342",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1289",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1271",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1237",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1281",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1279",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1302",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1313",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1275",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1296",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1246",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1329",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/2584",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1334",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1312",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1318",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1332",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1284",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1346",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1343",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1278",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1306",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1245",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1254",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1253",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1315",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1259",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1337",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1348",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1328",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1290",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1263",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1242",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1304",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1325",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1326",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1241",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1244",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1269",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1297",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1285",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1255",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1344",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/14094",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1327",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/4144",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1283",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1303",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1251",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1321",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1308",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1262",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/10607",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1252",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1260",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/2480",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1277",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1240",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1314",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1323",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1288",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1319",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1282",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1310",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1338",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1249",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/14357",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/7917",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1258",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/2468",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1264",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1349",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1301",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/3093",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1331",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1341",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1381",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1267",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1298",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1286",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1340",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1257",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1336",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1280",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1276",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1261",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1294",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1295",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1309",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1345",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1299",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1347",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1273",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1247",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1320",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1300",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1311",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1238",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1316",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1335",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/14359",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/8335",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/14704",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1317",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/3340",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1250",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1307",
+      "reason": "status 404"
+    },
+    {
+      "url": "https://vip.gatech.edu/teams/entry/1256",
+      "reason": "status 404"
+    }
+  ],
+  "parseErrors": [],
+  "omissions": [],
+  "validationFailures": [],
+  "imageFailures": [
+    {
+      "imageUrl": "https://vip.gatech.edu/files/formidable/18/2025-10-31/2D-Heterostructure-Synthesis.Resized-Pic-1-c6bc52-300x224.png",
+      "entryId": "1248"
+    },
+    {
+      "imageUrl": "https://vip.gatech.edu/files/formidable/18/2026-02-16/Student-Competition-Fidget-Group-81d9fd-300x198.png",
+      "entryId": "14350"
+    }
+  ],
+  "previousRecordCount": 2,
+  "published": true,
+  "exitCode": 0
+}

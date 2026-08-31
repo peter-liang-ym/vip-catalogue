@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2",
-  "generatedAt": "2026-08-31T16:39:43Z",
+  "generatedAt": "2026-08-31T18:51:37Z",
   "teamCount": 2,
   "teams": [
     {
@@ -13,16 +13,67 @@
       "goals": "To develop 2-D to 2-D tunneling structures to enable for smaller, faster, more capable microelectronic devices applied to a broad range of applications such as energy, RF, and sensing.",
       "issuesAddressed": "GT has a unique opportunity to apply significant experience and capability in Molecular Beam Epitaxy within GTRI (Wagner) to the synthesis of novel 2-D materials being studied within the Vogel group. This vertically integrated project (VIP) will synthesize large area 2-D materials (e.g., MoS2 and WS2) and device structures using thin film deposition and microfabrication techniques. The impact of synthesis conditions (e.g., plasma assist, source materials, and temperatures) on crystal structure will be studied using techniques such as SEM, XRD, XPS, and Raman. These materials structures will then be fabricated into 2D-to-2D tunnel junctions and TFETs using microfabrication processes (e.g. photolithography, interlayer dielectrics, metallization, etc.). Once fabricated, detailed electrical characterization of these devices will be carried out, utilizing conventional (current-voltage, capacitance voltage, etc.) and specialized (e.g. inelastic tunneling spectroscopy) techniques.",
       "partnersSponsors": "MKS Instruments, DTRA",
-      "methodsTechnologies": "",
-      "majorsSought": [],
-      "preferredInterests": "",
-      "advisors": [],
+      "methodsTechnologies": "Molecular Beam Epitaxy\n\nCleanroom Microfabrication\n\nElectron Microscopy\n\nElectrical Characterization\n\nChemical Vapor Deposition\n\nNanomaterial Synthesis\n\nRaman/Optical Spectroscopy\n\nElectrical Design",
+      "majorsSought": [
+        {
+          "college": "Engineering",
+          "major": "Computer Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Electrical Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Materials Science and Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Mechanical Engineering"
+        },
+        {
+          "college": "Sciences",
+          "major": "Biology"
+        },
+        {
+          "college": "Sciences",
+          "major": "Mathematics"
+        },
+        {
+          "college": "Sciences",
+          "major": "Physics"
+        }
+      ],
+      "preferredInterests": "MSE, ECE, ME – Background/interest in materials and device design, synthesis and characterization. Cleanroom and microscopy skills helpful but not required.",
+      "advisors": [
+        {
+          "name": "Brent Wagner",
+          "affiliation": "Georgia Tech Research Institute",
+          "email": "brent.wagner@gtri.gatech.edu"
+        },
+        {
+          "name": "Eric Vogel",
+          "affiliation": "Georgia Tech Research Institute",
+          "email": "eric.vogel@mse.gatech.edu"
+        },
+        {
+          "name": "Hunter Chan",
+          "affiliation": "Georgia Tech Research Institute",
+          "email": "hunter_chan@defaultemail.com"
+        }
+      ],
       "meeting": {
-        "day": "",
-        "time": "",
-        "location": ""
+        "day": "Thursday",
+        "time": "9:30-10:20",
+        "location": "Baker 101E Subteam meetings scheduled after classes begin."
       },
-      "meetingWindow": null
+      "meetingWindow": [
+        {
+          "weekday": "Thursday",
+          "startMinute": 570,
+          "endMinute": 620
+        }
+      ]
     },
     {
       "entryId": "14350",
@@ -34,16 +85,205 @@
       "goals": "A collaborative hub advancing touch-based, physical–digital interactions through shared knowledge and tools.\n\nOur goal is to grow the founding Georgia Tech chapter of the Tactile Media Alliance into a campus hub for tactile media research, teaching, and collaboration, in partnership with the Tactile Technology Lab, CIDI’s AT-Network.Net, and national and international collaborators. Through this work, students help build the shared infrastructure that makes tactile media research and practice more sustainable, including reusable tactile techniques, accessible platforms for sharing tactile media, and strong practices for documentation, accessibility, onboarding, facilitation, and collaboration. The program also creates opportunities to gain hands-on experience in design research, prototyping, fabrication, accessibility, and human-centered design while contributing to innovation in tactile media hardware, interfaces, interaction techniques, and support for non-visual making.",
       "issuesAddressed": "Touch shapes how people learn, navigate, and build skill, yet most digital systems still prioritize sight and sound. This team develops tactile media—interactive experiences that communicate through texture, vibration, force, compliance, shape-change, and physical manipulation. Because tactile perception is active, exploratory, and context-dependent, touch cannot be treated as a simple add-on to a finished interface (Gibson, 1962; Lederman & Klatzky, 1987). Tactile interaction is also difficult to design and evaluate, since small changes in materials, fabrication tolerances, sensing and actuation limits, and perceptual thresholds can significantly alter what users feel (Burdea, 1996; Hayward et al., 2004). Many ideas therefore stall as fragile prototypes, hard-to-compare results, or documentation that others cannot reproduce (Stangl et al., 2019; Suzuki et al., 2017). These challenges reflect broader problems of practice, including the stigma of touch, limited opportunities for tactile learning and participation, uneven access to tools and materials, unstable design resources, and weak pathways for sharing methods and expertise (Stangl et al., 2019). This VIP works to make touch a first-class medium for accessible, learnable, and meaningful interaction while building shared infrastructure that helps future teams move faster and with greater rigor. It also addresses the need for stronger trade pathways, professional networks, and communities of practice that can support non-visual making, tactile media production, and long-term field-building. The work grows Georgia Tech’s chapter of the Tactile Media Alliance (TMA) and the Tactile Technology Lab into a durable community of practice and a reliable production engine for tactile interaction research. Communities of practice matter here because they stabilize shared language, tools, and quality criteria, preserve expertise as projects change, and support continuous improvement through critique and mentorship (Lave & Wenger, 1991; Wenger, 1998). These functions strengthen both research quality and pathways into practice across design, engineering, accessibility, education, and creative technology. Students work across the full pipeline from concept to evidence. They co-design with blind and low-vision partners, prototype tactile artifacts through analog and digital fabrication, build embedded sensing and actuation systems, design interaction techniques, run accessibility-informed evaluations, and produce artifact records with material annotations, design rationales, and reusable protocols. They also contribute to the sociotechnical infrastructure that supports continuity in this work, including documentation practices, reusable techniques, collaboration structures, and networks that connect research to professional practice and emerging trade knowledge around non-visual making. Projects often serve as boundary objects across design, engineering, learning sciences, perception, and accessibility, and across settings such as education, museums, assistive technology, and public environments (Star & Griesemer, 1989). Over time, this approach supports cumulative science and transfer by producing comparable measures, reusable templates, and evidence-based guidelines that make tactile interaction easier to build, study, and deploy (Dourish, 2001; Wenger, 1998).",
       "partnersSponsors": "Center for Inclusive Design and Innovation, Tools for Life, 100+ TMA members",
-      "methodsTechnologies": "",
-      "majorsSought": [],
-      "preferredInterests": "",
-      "advisors": [],
+      "methodsTechnologies": "Participatory Co-Design: Stakeholders (e.g., blind/low-vision users) collaborate throughout ideation, prototyping, and evaluation. Majors: Industrial Design, HCI, Psychology, Accessibility Studies.\n\nContextual Inquiry + Task Analysis: We observe and interview in real settings to map workflows, constraints, and success criteria. Majors: Human Factors, Learning Sciences, Psychology, Industrial Engineering.\n\nRapid Prototyping (Iterative Design): We run fast build–test–refine cycles across low- to high-fidelity prototypes. Majors: Design, Mechanical Engineering, HCI, CS.\n\nDigital Fabrication + Materials: We use CAD/CAM and material experiments to achieve reliable tactile qualities. Majors: Mechanical Engineering, Materials Science, Design, Architecture.\n\nEmbedded Systems Prototyping: We integrate microcontrollers, sensors, actuators, power, and firmware to make interactive tactile devices. Majors: ECE, Computer Engineering, CS, Robotics.\n\nHaptic Actuation + Control: We design and tune vibrotactile, force, and shape-change outputs for stability and perceptual clarity. Majors: ECE, ME, Robotics, Biomedical Engineering.\n\nPsychophysics: We measure tactile thresholds and discrimination to calibrate devices and compare designs. Majors: Psychology, Neuroscience, Human Factors, HCI.\n\nMixed-Methods User Studies: We combine usability metrics with interviews and accessibility protocols to evaluate experience. Majors: HCI, Psychology, Education, Public Health.\n\nEducational Design + Learning Assessment: We design tactile learning activities and measure learning outcomes with formative assessment. Majors: Learning Sciences, Education, HCI, Psychology.\n\nDFM/DFA + Deployment: We plan for manufacturing and delivery using costed BOMs, assembly/sourcing strategies, and partner pilots. Majors: Mechanical/Manufacturing Engineering, Industrial Engineering, Supply Chain, Business.",
+      "majorsSought": [
+        {
+          "college": "Business",
+          "major": "Accounting"
+        },
+        {
+          "college": "Business",
+          "major": "General Management"
+        },
+        {
+          "college": "Business",
+          "major": "IT Management"
+        },
+        {
+          "college": "Business",
+          "major": "Leadership and Organizational Change"
+        },
+        {
+          "college": "Business",
+          "major": "Marketing"
+        },
+        {
+          "college": "Business",
+          "major": "Operations and Supply Chain Management"
+        },
+        {
+          "college": "Business",
+          "major": "Strategy and Innovation"
+        },
+        {
+          "college": "Computing",
+          "major": "Algorithms"
+        },
+        {
+          "college": "Computing",
+          "major": "Combinatorics and Optimization"
+        },
+        {
+          "college": "Computing",
+          "major": "Computational Media"
+        },
+        {
+          "college": "Computing",
+          "major": "Computer Science"
+        },
+        {
+          "college": "Computing",
+          "major": "Human-Centered Computing"
+        },
+        {
+          "college": "Computing",
+          "major": "Human-Computer Interaction"
+        },
+        {
+          "college": "Design",
+          "major": "Architectural Technology"
+        },
+        {
+          "college": "Design",
+          "major": "Architecture"
+        },
+        {
+          "college": "Design",
+          "major": "Industrial Design"
+        },
+        {
+          "college": "Design",
+          "major": "Music Technology"
+        },
+        {
+          "college": "Design",
+          "major": "Urban Design"
+        },
+        {
+          "college": "Engineering",
+          "major": "Bioinformatics"
+        },
+        {
+          "college": "Engineering",
+          "major": "Civil Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Computer Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Electrical Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Health Systems"
+        },
+        {
+          "college": "Engineering",
+          "major": "Industrial Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Machine Learning"
+        },
+        {
+          "college": "Engineering",
+          "major": "Materials Science and Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Mechanical Engineering"
+        },
+        {
+          "college": "Engineering",
+          "major": "Robotics"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Applied Languages and Intercultural Studies"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Computational Media"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Digital Media"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Film and Media Studies"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Global Media and Cultures"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "History"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Technology"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "and Society"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Literature"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Media"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "and Communication"
+        },
+        {
+          "college": "Liberal Arts",
+          "major": "Public Policy"
+        },
+        {
+          "college": "Sciences",
+          "major": "Applied Physiology"
+        },
+        {
+          "college": "Sciences",
+          "major": "Neuroscience"
+        },
+        {
+          "college": "Sciences",
+          "major": "Psychology"
+        },
+        {
+          "college": "Sciences",
+          "major": "Statistics"
+        }
+      ],
+      "preferredInterests": "Interest in hands-on making and interaction design; comfort learning tools; basic coding and/or basic electronics and/or fabrication experience helpful but not required. Curiosity and follow-through matter more than prior expertise. Willingness to document work carefully and collaborate respectfully with community partners, including blind collaborators.",
+      "advisors": [
+        {
+          "name": "Abigale Stangl",
+          "affiliation": "Industrial Design",
+          "email": "astangl3@gatech.edu"
+        }
+      ],
       "meeting": {
-        "day": "",
-        "time": "",
-        "location": ""
+        "day": "Wednesday",
+        "time": "3:30 – 4:20",
+        "location": "CIDI Ground Floor Tactile Technology Lab Subteam meetings scheduled after classes begin."
       },
-      "meetingWindow": null
+      "meetingWindow": [
+        {
+          "weekday": "Wednesday",
+          "startMinute": 930,
+          "endMinute": 980
+        }
+      ]
     }
   ]
 }
