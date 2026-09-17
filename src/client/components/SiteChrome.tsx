@@ -47,7 +47,7 @@ export const SOURCE_SITE_LINK_TEXT = 'Official Georgia Tech VIP team pages';
 export const ATTRIBUTION_TEXT =
   'Team information is published by the Georgia Tech Vertically Integrated Projects (VIP) program.';
 
-export const SITE_TITLE = 'VIP Teams Mirror';
+export const SITE_TITLE = 'VIP Teams Catalog';
 
 /** The site navigation's accessible name (Requirement 11.7). */
 export const SITE_NAV_LABEL = 'Site';

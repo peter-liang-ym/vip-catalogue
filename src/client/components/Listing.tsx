@@ -90,7 +90,7 @@ import { TeamCard } from './TeamCard';
  * visitor interaction.
  */
 export const UNOFFICIAL_MIRROR_NOTICE =
-  'This is an unofficial mirror of Georgia Tech VIP team information. It is not operated by Georgia Tech.';
+  'This is an unofficial catalog of Georgia Tech VIP team information. It is not operated by Georgia Tech.';
 
 /** The pagination controls' labels (Requirement 11.7). */
 export const PAGE_NUMBER_LABEL = 'Page number';
