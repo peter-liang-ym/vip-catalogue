@@ -519,6 +519,17 @@ export function parseTeamPage(html: string, sourceUrl: string): ParseOutcome {
         omit(`advisor with no email: ${advisor.name}`);
       }
     }
+
+    // Advisor addresses are read but never published. The Source_Site states them
+    // one team page at a time behind a page load; the Dataset is one public file,
+    // so republishing them would turn addresses that are merely public into a list
+    // anyone can take in a single request. The Team_Detail_View points at the
+    // Source_Site page instead, which is where the address stays.
+    //
+    // The redaction happens after the loop above so the Ingestion_Report still
+    // distinguishes an Advisor the Source_Site gives no address for from one whose
+    // address was dropped here.
+    advisors = advisors.map(advisor => ({ ...advisor, email: '' }));
   }
 
   const meetingBody = bodies.get('meeting');

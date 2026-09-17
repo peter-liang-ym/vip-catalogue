@@ -1,0 +1,166 @@
+/*
+ * Controls: one focus indicator, one target-size floor, one boundary treatment.
+ *
+ * These are the three Requirement 11 constraints that apply to every
+ * interactive control regardless of which view it appears in, so they are stated
+ * once here against element selectors rather than repeated per component. The
+ * per-view stylesheets style the controls' surroundings; nothing there needs to
+ * restate focus, hit area, or boundary color, and nothing there may cancel them.
+ *
+ * Selectors are wrapped in `:where()` so this file contributes at zero
+ * specificity: a per-view rule can change a control's padding or its border
+ * color without fighting, while the `:focus-visible` recipe below is the one
+ * exception that is deliberately not overridable.
+ *
+ * No token is defined here. `--focus-width`, `--border-width`, `--ink`,
+ * `--border-strong`, `--surface`, and the spacing scale all come from
+ * `tokens.css`, including their `prefers-contrast: more` values.
+ */
+
+/* ----------------------------------------------------- 1. focus indicator */
+
+/*
+ * Requirement 11.5, in one rule for every focusable thing on the page: the
+ * search field, the four Filters' checkboxes, the sort control, the pagination
+ * controls, the page-size control, the Calendar_File input, the removal control,
+ * the hide-conflicts toggle, every Team_Card link, the footer links, and the
+ * `tabindex` parse-in-progress notice.
+ *
+ * `outline` is the whole indicator, which is what makes it enclose the control:
+ * it is drawn around the control's entire border box on all four sides, it is
+ * not part of the box model, so nothing reflows when it appears, and it follows
+ * the control's own `border-radius`.
+ *
+ * `--ink` is the ring color, which is the highest-contrast value either theme
+ * has against its own surfaces, so the same ring clears 11.5's 3:1 against
+ * `--bg`, `--surface`, and `--surface-sunken` in light and in dark. The 2px
+ * offset leaves a gap of whichever background the control sits on between the
+ * ring and the control's own boundary, so the ring reads as a ring rather than
+ * as a thicker border.
+ *
+ * The ring persists for exactly as long as the control holds focus: no
+ * transition, no animation, and no timer is involved — `:focus-visible` stops
+ * matching only when focus leaves.
+ *
+ * `!important` is here to suppress the `outline: none` path. No rule in this
+ * project removes a focus indicator, and this is what keeps that true: a later
+ * stylesheet, a component style, or a copied snippet cannot take the ring away,
+ * whatever its specificity.
+ */
+:focus-visible {
+  outline: var(--focus-width) solid var(--ink) !important;
+  outline-offset: var(--focus-width);
+}
+
+/*
+ * Keeping the ring visible where a Team_Card's hairline border or its 4px state
+ * rail would otherwise crop it. A focused control's outline already paints after
+ * its ancestors' borders, and raising the focused control one step settles the
+ * remaining case, a control flush against the card edge whose ring extends over
+ * the rail or under a neighboring surface's border. Nothing in the styles clips
+ * a card, a panel, or the listing, so the offset ring is never cut off by an
+ * ancestor either.
+ *
+ * `position: relative` with no offsets moves nothing; it exists only so
+ * `z-index` applies.
+ */
+:where(a, button, input, select, textarea, label, [tabindex]):focus-visible {
+  position: relative;
+  z-index: 1;
+}
+
+/* -------------------------------------------------------- 2. target sizes */
+
+/*
+ * Requirement 11.9: at least 24 by 24 CSS pixels of target for every control.
+ * The floor is spent on padding and on minimums, never on type size or on the
+ * painted box, so the density the identity is built on survives it.
+ */
+:where(
+  button,
+  select,
+  textarea,
+  input:not([type='checkbox'], [type='radio']),
+  label
+) {
+  --target-min: 24px;
+  min-height: var(--target-min);
+  min-width: var(--target-min);
+}
+
+/* Buttons and the text-like controls: the padding is the hit area. */
+:where(button) {
+  padding: var(--space-1) var(--space-3);
+}
+
+:where(select, textarea, input:not([type='checkbox'], [type='radio'])) {
+  padding: var(--space-1) var(--space-2);
+}
+
+/*
+ * Checkboxes and radios keep their native box at its native size — enlarging it
+ * would enlarge four columns of Filter values, the hide-conflicts toggle, and
+ * the three theme settings, which is the density this requirement is not allowed
+ * to cost. The target is extended through the associated `label` instead: a
+ * `label` bound by `for` activates its control, so the pair's target is the
+ * label's box, which the rule above floors at 24px tall and which every Filter
+ * value's and every theme setting's text carries well past 24px wide.
+ *
+ * `inline-flex` is what lets `min-height` apply to a label that is otherwise an
+ * inline box, and the padding is the rest of the hit area.
+ */
+:where(label) {
+  display: inline-flex;
+  align-items: center;
+  padding-block: var(--space-1);
+}
+
+/* The page's ink for the checked mark and the focus-adjacent chrome the platform
+   draws, so the control's own rendering matches the text around it. */
+:where(input[type='checkbox'], input[type='radio']) {
+  accent-color: var(--ink);
+}
+
+/*
+ * Links stay inline: a team name, a major, or an advisor email has to be able to
+ * wrap mid-link, which `inline-block` and a `min-width` would both prevent. So
+ * the hit area grows vertically through `padding-block`, which an inline box
+ * does honor for hit testing, and which paints nothing because a link here has
+ * no background or border of its own. Every link in the catalog — team names,
+ * the two fixed links, the listing link, the Source_Site link, the masthead —
+ * is far wider than 24px, so the vertical floor is the only one to set.
+ */
+:where(a) {
+  padding-block: var(--space-1);
+}
+
+/* --------------------------------------------------- 3. control boundaries */
+
+/*
+ * Requirement 11.3's second clause, and Requirement 18.7's: the boundary of
+ * every interactive control at 3:1 or better against the background next to it.
+ * That is exactly what `--border-strong` is for — it is the token held to 3:1 in
+ * both themes — while `--border` is permitted below it and is confined to
+ * dividers inside an already-bordered surface. A control boundary is never a
+ * divider, so it is `--border-strong` everywhere, with no per-view exception.
+ *
+ * The `--surface` fill is what makes that true on either background: a control
+ * reads as a control on the page field and inside a card without changing.
+ */
+:where(button, select, textarea, input:not([type='checkbox'], [type='radio'])) {
+  --control-border: var(--border-strong);
+  background: var(--surface);
+  border: var(--border-width) solid var(--control-border);
+  border-radius: var(--radius-control);
+}
+
+/*
+ * A zero-count Filter value and a pagination step at the end of the range are
+ * `disabled`: not interactive, so 11.3's control-boundary floor does not apply,
+ * and the not-selectable rendering is the faint ink the field rows already use.
+ * The boundary stays drawn, so the control keeps its place in the row.
+ */
+:where(button, select, textarea, input):disabled {
+  --control-border: var(--ink-faint);
+  color: var(--ink-faint);
+}

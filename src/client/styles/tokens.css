@@ -1,0 +1,214 @@
+/*
+ * Design tokens: the two-theme semantic layer, one font stack, the type scale,
+ * spacing, radii, and the accessibility media overrides. Tokens only — no
+ * component selectors live here, so every rule below is either `:root`, a
+ * `[data-theme]` block, or a media-query override of one of those.
+ *
+ * The identity is neutral and tool-like: near-white or near-black surfaces,
+ * hairline borders instead of shadows, one system UI face, and one accent. The
+ * accent is indigo, deliberately not an Institute color, which keeps it clear of
+ * the green/gray/red Conflict_State triad so a state rail never reads as
+ * emphasis. No Institute mark, wordmark, or seal is referenced anywhere.
+ *
+ * There is no raw palette layer. Every value below is a semantic alias, defined
+ * once per theme, and the component stylesheets reference only these names.
+ *
+ * Two of these tokens are contract rather than taste:
+ *
+ *   `--border-strong` carries every card edge and every control boundary, and is
+ *   held to the 3:1 that Requirements 11.3 and 18.7 demand of a boundary.
+ *   `--border` is permitted below 3:1 and is used only for dividers *inside* an
+ *   already-bordered surface, where no boundary meaning rests on it. One
+ *   hairline cannot do both jobs, which is why there are two.
+ *
+ * Theme resolution. Each color is defined twice: on `:root` for light, and on
+ * both `[data-theme='dark']` and inside a `prefers-color-scheme: dark` block.
+ * The media query is guarded to `:not([data-theme='light']):not([data-theme='dark'])`
+ * so an explicit setting always wins over the system preference, and anything
+ * else — no attribute at all, or `data-theme='system'` — follows the system.
+ *
+ * Because the pairings are asserted mechanically in both themes, the specific
+ * values are proposals: a failing pairing is fixed by moving the token, never by
+ * relaxing the ratio.
+ */
+
+:root {
+  /* ------------------------------------------------------- light theme */
+
+  color-scheme: light;
+
+  --bg: #fafafb; /* page */
+  --surface: #ffffff; /* cards and panels */
+  --surface-sunken: #f1f2f4; /* wells: a reserved image box, an inset */
+  --ink: #14161a; /* text */
+  --ink-muted: #555d6b; /* field labels */
+  --ink-faint: #686e79; /* not-selectable values */
+  --accent: #2f4bd0; /* links and emphasis */
+  --accent-hover: #23399f;
+  --accent-subtle: #eef1fd; /* an accent-tinted wash, never behind body text */
+  --highlight: #ffdf6b; /* search-term `mark` fill */
+  --highlight-ink: #14161a;
+
+  /* Boundaries. `--border-strong` is a boundary; `--border` is a divider. */
+  --border-strong: #838893;
+  --border: #dfe1e6;
+
+  /* Conflict_State. Color is decoration; the state is always also text. */
+  --state-clear: #0f7a5f;
+  --state-unknown: #767d89;
+  --state-conflict: #c22b45;
+
+  /* --------------------------------------------- theme-independent tokens */
+
+  /*
+   * One face for everything. The condensed display face and the monospace time
+   * face are gone: they bought a look and a column alignment that a system stack
+   * with `font-variant-numeric: tabular-nums` already gives, at the cost of two
+   * extra faces and a fallback path. Numbers — meeting times, clock ranges,
+   * entry ids, facet counts — ask for tabular figures at the point of use.
+   */
+  --font-ui:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
+    Arial, sans-serif;
+
+  /*
+   * Type scale: 16px base, ratio 1.2, explicit rem steps rather than a computed
+   * chain. `--text-xs` is the floor for every label, including the small-caps
+   * ones and the facet counts; nothing on the page is set below it. `--text-sm`
+   * is interface controls and facet values.
+   */
+  --text-root: 16px;
+  --text-xs: 0.8125rem; /* 13px: the label floor */
+  --text-sm: 0.875rem; /* 14px: controls and facet values */
+  --text-base: 1rem; /* 16px */
+  --text-md: 1.2rem; /* 19.2px */
+  --text-lg: 1.4375rem; /* 23px */
+  --text-xl: 1.75rem; /* 28px */
+  --text-2xl: 2.0625rem; /* 33px */
+
+  /* Leading. Density is the tone: tight inside a block, air between groups. */
+  --leading-tight: 1.2;
+  --leading-normal: 1.45;
+
+  /* 4px spacing scale. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radii: controls and cards, and rules. */
+  --radius-control: 2px;
+  --radius-surface: 2px;
+  --radius-rule: 0;
+
+  /* Boundaries and the state rail. */
+  --border-width: 1px;
+  /* The state rail: wide enough to read as an edge of its own beside a 1px
+     boundary, narrow enough that a grid of cards is not a grid of stripes. */
+  --rail-width: 3px;
+  --focus-width: 2px;
+
+  /*
+   * The identity is motion-free by construction; the only animated property is
+   * a border color on hover, so this token exists to be zeroed below.
+   */
+  --transition-duration: 120ms;
+}
+
+/* ------------------------------------------------------------- dark theme */
+
+/*
+ * The explicit setting. Stated once and reused by the media query below, so the
+ * two paths cannot drift apart.
+ */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #101216;
+  --surface: #181b21;
+  --surface-sunken: #14161b;
+  --ink: #e9ebef;
+  --ink-muted: #a8aeb9;
+  --ink-faint: #838a96;
+  --accent: #93a8ff;
+  --accent-hover: #b3c2ff;
+  --accent-subtle: #1b2138;
+  --highlight: #6b5200;
+  --highlight-ink: #ffefb8;
+
+  --border-strong: #646b79;
+  --border: #2a2e37;
+
+  --state-clear: #3bc49e;
+  --state-unknown: #838a96;
+  --state-conflict: #ff8098;
+}
+
+/*
+ * The system preference. `data-theme='light'` and `data-theme='dark'` are both
+ * excluded: the first must not be overridden by the system, and the second is
+ * already dark from the block above.
+ *
+ * The guard sits inside `:where()` so it contributes no specificity: this block,
+ * the `[data-theme='dark']` block, and `:root` all weigh the same, and source
+ * order alone decides between them — which is what lets the `prefers-contrast`
+ * override at the end of the file win in either theme.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light']):not([data-theme='dark'])) {
+    color-scheme: dark;
+
+    --bg: #101216;
+    --surface: #181b21;
+    --surface-sunken: #14161b;
+    --ink: #e9ebef;
+    --ink-muted: #a8aeb9;
+    --ink-faint: #838a96;
+    --accent: #93a8ff;
+    --accent-hover: #b3c2ff;
+    --accent-subtle: #1b2138;
+    --highlight: #6b5200;
+    --highlight-ink: #ffefb8;
+
+    --border-strong: #646b79;
+    --border: #2a2e37;
+
+    --state-clear: #3bc49e;
+    --state-unknown: #838a96;
+    --state-conflict: #ff8098;
+  }
+}
+
+/* ------------------------------------------------------- media overrides */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-duration: 0ms;
+  }
+}
+
+@media (prefers-contrast: more) {
+  /*
+   * Collapse the muted inks and both boundary tokens onto the theme's own
+   * `--ink`, so labels, not-selectable values, and every divider gain contrast
+   * against whichever surface they sit on. Stated against `:root` and placed
+   * after the theme blocks, so it wins in either theme while still reading
+   * `--ink` from the theme in force.
+   *
+   * `--accent` is left alone: it clears 4.5:1 against every surface in both
+   * themes, and links carry a persistent underline regardless.
+   */
+  :root {
+    --ink-muted: var(--ink);
+    --ink-faint: var(--ink);
+    --border-strong: var(--ink);
+    --border: var(--ink);
+    --state-unknown: var(--ink);
+    --border-width: 2px;
+  }
+}

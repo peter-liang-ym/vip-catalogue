@@ -1,0 +1,390 @@
+/*
+ * Layout: the page shell, the listing's columns, the card grid, and the wrapping
+ * rules that keep the page one column wide at every viewport.
+ *
+ * This file owns geometry only — widths, gutters, columns, gaps, and wrapping. No
+ * color, type, or border is set here, and no token is redefined; the four values
+ * the layout is built from are layout locals declared on `.site` (`--shell-max`,
+ * `--gutter`, `--sidebar`, `--card-min`) so a single edit moves the whole shell.
+ *
+ * The three widths Requirement 11.6 has to survive, and what each looks like:
+ *
+ *   360  One column. The Filter_Panel sits behind the opening control
+ *        `FilterDrawer` renders below the sidebar breakpoint and opens as the
+ *        sheet at the end of this file; where `matchMedia` cannot answer, it
+ *        stacks above the listing exactly where the markup puts it instead. The
+ *        card grid is one card wide either way.
+ *   ~700 Still one column of blocks, but the card grid has become two cards wide
+ *        on its own: `repeat(auto-fill, minmax(...))` fits as many cards as the
+ *        track allows, so the card count per row is a consequence of the
+ *        available width rather than of a breakpoint. The four Filter groups fill
+ *        out the same way.
+ *   1000 The Filter_Panel becomes a sidebar beside the card grid, and the grid
+ *        keeps fitting cards into whatever the sidebar leaves.
+ *   1920 The shell is capped at `--shell-max` and centered on the page field,
+ *        and the prose blocks are capped at `--measure`, so a line of text stays
+ *        a readable length rather than running the width of the display.
+ *
+ * There is exactly one media query in this file, the sidebar at 1000, because
+ * every other change of shape falls out of intrinsic sizing.
+ *
+ * Requirement 11.1 constrains all of it: visual order equals DOM order
+ * everywhere. Nothing here sets `order`, `grid-row`, `grid-column`, or
+ * `flex-direction: *-reverse`, and nothing is positioned out of flow. The sidebar
+ * is a float, which is the one arrangement that puts the Filter_Panel to the left
+ * of the blocks that follow it in the markup while leaving those blocks in
+ * document order and in their own rows — so reading the page left to right, top to
+ * bottom, gives the same sequence as tabbing through it.
+ *
+ * Requirement 11.6's other half is horizontal overflow: a long team name, a long
+ * major, or an advisor email is allowed to wrap or break instead of widening the
+ * page. `overflow-wrap: break-word` is inherited from `.site` for ordinary text;
+ * the fields that carry a single unbreakable run get `overflow-wrap: anywhere`,
+ * which is the one that also lowers the min-content contribution, so a grid track
+ * cannot be forced wider than its share. `overflow: hidden` is deliberately not
+ * used anywhere: it would trade the scrollbar for clipped content and clipped
+ * focus rings. The one scroll container this file does create is the filter rail
+ * from 1000 up, which scrolls rather than clips and keeps inline room for the
+ * focus ring.
+ */
+
+/* ---------------------------------------------------------------- the shell */
+
+.site {
+  /* Layout locals. Not tokens: nothing outside this file reads them. */
+  /*
+   * 1760px. The cap exists so a line of chrome does not run the width of a
+   * display; the prose blocks are capped at `--measure` regardless, so it can sit
+   * above 1440 without hurting readability, and it has to: at a 1440 cap a 1800px
+   * viewport gives the card grid exactly the width a 1440px one does, so no track
+   * width can fit five cards at 1800 and four at 1400.
+   */
+  --shell-max: 110rem;
+  --gutter: var(
+    --space-5
+  ); /* the page's inline breathing room, matching the masthead */
+  --measure: 72ch; /* the cap on a line of prose */
+  --sidebar: 15rem; /* 240px of Filter_Panel from 1000 up */
+  --column-gap: var(--space-8); /* between the sidebar and the listing */
+  /*
+   * 248px: the narrowest a Team_Card is set, and the whole of the column count.
+   * With the 20px gutters, the 240px sidebar, the 32px column gap, and the 24px
+   * grid gap, the grid gets 1088px at a 1400px viewport and 1448px at 1760px and
+   * wider, which fits four cards at 1400 and five from roughly 1700 up — both
+   * without a breakpoint. 304px reached three and stopped.
+   */
+  --card-min: 15.5rem;
+  /*
+   * The filter rail's two vertical values, from 1000 up. `--rail-top` is the
+   * inset the rail keeps from the top of the viewport once it has stuck, and
+   * `--masthead-band` is the height of the masthead lockup and its
+   * unofficial-mirror band, which is what the rail starts below before any
+   * scrolling. Bounding the rail's height by the viewport less that band is what
+   * makes it fit on screen at scroll-top; after the band has scrolled away the
+   * rail is a little shorter than the space available, which costs nothing and
+   * avoids a dead gap above it. It is an approximation of a height nothing here
+   * can measure, and it only ever makes the rail shorter, so it cannot overflow.
+   */
+  --rail-top: var(--space-4);
+  --masthead-band: 11rem;
+
+  max-width: var(--shell-max);
+  margin-inline: auto;
+
+  /* Inherited by every descendant: ordinary text breaks inside a word only when
+     the word alone would otherwise overflow. */
+  overflow-wrap: break-word;
+}
+
+/*
+ * The gutter belongs to the page regions rather than to `.site`, because the
+ * masthead, the freshness notices, and the footer already carry their own from
+ * `base.css`, and because the unofficial-mirror notice is bled back out below.
+ */
+.listing,
+.team-detail,
+.not-found,
+.team-detail__listing {
+  padding-inline: var(--gutter);
+}
+
+.listing,
+.team-detail,
+.not-found {
+  padding-block-end: var(--space-10);
+}
+
+/*
+ * The two Dataset load states are bordered blocks rather than page regions, so the
+ * gutter is inset from their edges as margin — the same way the freshness notices
+ * are — leaving their own padding to hold their text off their border.
+ */
+.dataset-loading,
+.load-failure {
+  margin-inline: var(--gutter);
+}
+
+/*
+ * The notice is part of the masthead lockup, so it spans the shell rather than
+ * the listing's content box: the negative inline margin cancels the gutter above,
+ * which puts its own padding — and therefore its text and its bottom rule — on
+ * the same lines as the header's. The bottom margin `base.css` gives it stands.
+ */
+.listing__notice {
+  margin-inline: calc(-1 * var(--gutter));
+}
+
+/*
+ * The shell's default gap between the listing's blocks. Per-surface spacing
+ * belongs to the surfaces, so a later stylesheet that wants a different gap for
+ * one block should override `margin-block-start` on it rather than add a second
+ * margin. Adjacent margins collapse, so the notice's larger bottom margin is not
+ * added to this one.
+ */
+.listing > * + * {
+  margin-block-start: var(--space-6);
+}
+
+/* ------------------------------------------------------------- the filter rail */
+
+/*
+ * The rail is the Filter_Panel plus the calendar disclosure above it, in one
+ * wrapper, because they share a placement: from 1000 up the wrapper is what floats,
+ * sticks, and scrolls, so the two surfaces travel together instead of the calendar
+ * disclosure being one more block inset into the results column. Below the
+ * breakpoint the wrapper is an ordinary block and the two stack, which is where the
+ * drawer's own opening control appears.
+ */
+.filter-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* --------------------------------------------------------- the Filter_Panel */
+
+/*
+ * The four Filters fill the width they are given: one column on a phone, two or
+ * more once there is room, and one again once the panel is the sidebar. Same
+ * intrinsic device as the card grid, so this needs no breakpoint either.
+ *
+ * `min-width: 0` on the group is what lets a long Major value wrap instead of
+ * setting the track's width: a `fieldset` otherwise floors its inline size at its
+ * min-content width, which is exactly the horizontal scrolling 11.6 forbids.
+ */
+.filter-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
+  gap: var(--space-4) var(--space-6);
+  align-items: start;
+}
+
+.filter-panel__group {
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------ the card grid */
+
+/*
+ * `auto-fill` with a `minmax` track is the whole of the responsive card count:
+ * one card at 360, two by roughly 700, four at 1400, and five from roughly 1700
+ * to the shell's cap, with no breakpoint stating any of it. `--card-min` above is
+ * where those counts come from.
+ *
+ * `min(var(--card-min), 100%)` is the part that holds at 360: a bare
+ * `minmax(15.5rem, 1fr)` track keeps its floor even when the container is
+ * narrower than that, and overflows. Clamping the floor to the container makes
+ * the single column exactly as wide as the space available.
+ *
+ * The list's marker and indent go, since the grid is the arrangement now. The
+ * margin is left alone so the stack rhythm above still applies to it.
+ */
+.listing__cards {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(var(--card-min), 100%), 1fr)
+  );
+  gap: var(--space-6);
+  padding-left: 0;
+  list-style: none;
+}
+
+/*
+ * Each item is a one-column grid, which stretches its Team_Card to the height of
+ * the row: cards in a row share an edge without any height being declared.
+ * `min-width: 0` lets the card's contents wrap rather than widen the track.
+ */
+.listing__card {
+  display: grid;
+  min-width: 0;
+}
+
+/* ------------------------------------------------- the sidebar, from 1000px */
+
+/*
+ * 62.5rem is 1000 CSS pixels at the 16px root, and it is stated in `rem` so the
+ * arrangement follows the text size rather than fighting it.
+ *
+ * The filter rail floats and the blocks that follow it in the markup are inset
+ * by the sidebar's width, which gives a genuine two-column page while leaving
+ * every one of those blocks in document order, in its own row, and sized by its
+ * own content. A grid or flex arrangement would put the rail and the block after
+ * it in one row, and the rail is the tallest thing on the page, so everything
+ * below that block would be pushed past the bottom of it.
+ *
+ * `flow-root` contains the float, so the rail can be taller than the listing
+ * beside it without escaping into the footer.
+ *
+ * `float: left` rather than `inline-start`: the site is LTR only, and this is the
+ * spelling every target browser has.
+ */
+@media (min-width: 62.5rem) {
+  .listing {
+    display: flow-root;
+  }
+
+  .filter-panel {
+    /* One column at this width; the panel is the narrow measure now. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .filter-rail {
+    float: left;
+    width: var(--sidebar);
+
+    /*
+     * The rail scrolls itself. This is the fix for the defect the disclosures
+     * only shrink: a panel taller than the viewport used to set the page's
+     * height, so reaching a Filter meant scrolling past the whole catalog and
+     * back. Bounded by the viewport and given its own `overflow-y`, the rail can
+     * no longer contribute to page height at all — whatever the four groups
+     * expand to, the page is as tall as the listing beside it.
+     *
+     * `sticky` keeps it in view while the listing scrolls; it holds its place in
+     * the flow, so the float still insets the blocks after it and the visual
+     * order still equals the DOM order (Requirement 11.1). `contain` stops the
+     * rail's scroll from chaining to the page when it reaches either end, so
+     * scrolling inside the rail never moves the catalog.
+     */
+    position: sticky;
+    top: var(--rail-top);
+    max-height: calc(100vh - var(--masthead-band));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /*
+     * A scroll container clips on both axes, and the focus ring is drawn 4px
+     * outside a control's border box, so the rail keeps that much inline room for
+     * it. Without this, the ring on a checkbox at either edge would be cropped,
+     * which Requirement 11.5 does not allow.
+     */
+    padding-inline: calc(var(--focus-width) * 2);
+  }
+
+  /*
+   * Every block after the filter rail: the count, the page position, the card
+   * grid, the empty state, and the pagination. Stated as a sibling relation
+   * rather than as a list of class names, so a block added to or removed from the
+   * listing needs no edit here.
+   *
+   * A later stylesheet spending space on one of these blocks should use
+   * `margin-block`, not the `margin` shorthand, which would drop this inset.
+   */
+  .filter-rail ~ * {
+    margin-inline-start: calc(var(--sidebar) + var(--column-gap));
+  }
+}
+
+/* ------------------------------------------- the filter drawer, below 1000px */
+
+/*
+ * The sheet the Filter_Panel opens into below the sidebar breakpoint
+ * (Requirement 19.8). There is no media query here, and there does not need to
+ * be: `FilterDrawer` renders this wrapper only while its own `matchMedia` query —
+ * the exact complement of the 62.5rem one above — matches, so from 1000 up these
+ * elements are not in the document at all and the float above is the only
+ * arrangement in force.
+ *
+ * `fixed` with `inset: 0` is what keeps the sheet on screen while the page behind
+ * it stays where it was, and it is the one place in this file something is taken
+ * out of flow — the sheet is the whole viewport while it is open, so nothing is
+ * beside it to be reordered and the DOM order it presents its controls in is
+ * still the visual one (Requirement 11.1).
+ *
+ * The sheet scrolls itself, so a phone-height viewport reaches the fourth Filter
+ * group, and `overscroll-behavior: contain` stops that scroll from chaining to
+ * the page underneath.
+ */
+.filter-drawer__sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--gutter);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/*
+ * `hidden` is how the closed sheet leaves the tab order and the accessibility
+ * tree, and the rule above would otherwise override the attribute's own
+ * `display: none`. Stated after it, and at a specificity that beats it.
+ */
+.filter-drawer__sheet[hidden] {
+  display: none;
+}
+
+/* The close control sits at the sheet's far edge on its own row: first in the
+   markup and first on screen, so the two orders agree. */
+.filter-drawer__close {
+  align-self: flex-end;
+}
+
+/*
+ * The page behind the open sheet does not scroll. `FilterDrawer` puts this class
+ * on the document element for exactly as long as the sheet is open; it is set on
+ * both the root and the body because either one can be the scrolling element.
+ * The sheet is `fixed`, so it is unaffected and scrolls on its own.
+ */
+.filter-drawer-open,
+.filter-drawer-open body {
+  overflow: hidden;
+}
+
+/* ------------------------------------------------------- measure and wrapping */
+
+/* Prose is capped at a readable line length even in the widest shell. */
+.team-detail__text,
+.empty-state__message,
+.load-failure__message {
+  max-width: var(--measure);
+}
+
+/*
+ * The fields whose values can be one long unbreakable run: a team name, a Major
+ * in a Filter label or a detail list, a calendar file name. `anywhere` rather than
+ * `break-word` because these sit inside grid tracks,
+ * and only `anywhere` also lowers the min-content contribution that would
+ * otherwise widen the track.
+ */
+.team-card__name,
+.team-detail__name,
+.team-detail__majors,
+.filter-panel__label,
+.selected-values__value,
+.calendar-status__file {
+  overflow-wrap: anywhere;
+}
+
+/*
+ * The controls that size themselves from their content — the search field and the
+ * page-number and page-size selects, whose longest option decides their width —
+ * stay inside their container. Element selectors, so any per-view width wins.
+ */
+input,
+select,
+textarea {
+  max-width: 100%;
+}

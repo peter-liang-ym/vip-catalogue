@@ -2,12 +2,30 @@
  * The listing page (Requirements 4.1, 4.4, 4.5, 4.7, 4.9, 10.1, 11.4, 11.12).
  *
  * The listing is the composition surface: it renders the unofficial-mirror
- * notice, the search field, the selected-value indicators, the Filter_Panel, the
- * sort control, the calendar surfaces, the matching count, the page position, the
- * Team_Cards of the current page, the empty state, and the pagination controls.
- * The calendar surfaces are the listing's because the toggle is a Query_State
- * control like the sort control and commits the same way, and because the file
- * control, what is loaded, and the toggle read one `CalendarState` between them.
+ * notice, the filter rail with the Filter_Panel and the calendar disclosure, one
+ * results toolbar, the Team_Cards of the current page, the empty state, and the
+ * pagination controls. The search field is the masthead's — it is the site's
+ * primary action and the chrome is where a primary action belongs — so the shell
+ * hands the typing handler to `SiteChrome` instead of to this component.
+ *
+ * Everything that reports on or narrows the Result_Set is in that one toolbar,
+ * directly above the grid it describes: the matching count and the page position
+ * in the tabular numeric column, the sort control, the page-size control, the
+ * hide-conflicts toggle, and the selected-value indicators with the clear-all
+ * control beside them. Those controls were previously spread over three places —
+ * the rail top, a row above the grid, and the pager at the foot of the page — so
+ * reading a count and then changing what produced it meant crossing the whole
+ * catalog. The bottom pager stays where it is, because stepping to the next page
+ * is what a visitor wants at the end of the current one.
+ *
+ * The two calendar-facing surfaces are deliberately in different places, because
+ * they change different things. The hide-conflicts toggle edits Query_State, like
+ * the sort control, so it sits in the toolbar above the Result_Set it narrows.
+ * Supplying a Calendar_File edits device state and never the Result_Set directly,
+ * so it sits in the rail behind a collapsed disclosure, where it displaces no
+ * Team_Card. Both read the one `CalendarState` this component is handed, and
+ * neither derives from it.
+ *
  * It derives nothing
  * — `derive` has already decided the Result_Set, which page of it is shown, how
  * many pages there are, and why the Result_Set is empty when it is — so every
@@ -36,8 +54,17 @@
  *
  * The controls read `view.pageNumber` rather than `qs.pageNumber`, so stepping
  * from a page that `derive` reset or clamped steps from the page on screen.
+ *
+ * A page-number or page-size change also scrolls the top of the results region
+ * back into view, because the pager that caused it is at the foot of a page of
+ * cards and the new page's first card is above the viewport when it lands. Only
+ * those two changes scroll: typing into the search field moves nothing — no focus
+ * and no scroll — so a burst of keystrokes leaves the field where it is
+ * (Requirement 11.12), and the count's live region announces every Result_Set
+ * change without anything moving.
  */
 
+import { useRef } from 'preact/hooks';
 import type { CalendarState } from '../calendarState';
 import type { DerivedView } from '../derive';
 import {
@@ -49,10 +76,9 @@ import type { QueryState } from '../queryState';
 import { routeHref } from '../router';
 import { terms } from '../search';
 import { CLEAR_ALL_RESET } from '../selections';
-import { CalendarControl } from './CalendarControl';
-import { CalendarStatus } from './CalendarStatus';
+import { CalendarDisclosure } from './CalendarDisclosure';
 import { EmptyState } from './EmptyState';
-import { FilterPanel } from './FilterPanel';
+import { FilterDrawer } from './FilterDrawer';
 import { HideConflictsToggle } from './HideConflictsToggle';
 import { SelectedValues } from './SelectedValues';
 import { SortControl } from './SortControl';
@@ -66,9 +92,6 @@ import { TeamCard } from './TeamCard';
 export const UNOFFICIAL_MIRROR_NOTICE =
   'This is an unofficial mirror of Georgia Tech VIP team information. It is not operated by Georgia Tech.';
 
-/** The search field's label (Requirement 11.7). */
-export const SEARCH_LABEL = 'Search teams';
-
 /** The pagination controls' labels (Requirement 11.7). */
 export const PAGE_NUMBER_LABEL = 'Page number';
 export const PAGE_SIZE_LABEL = 'Teams per page';
@@ -78,7 +101,6 @@ export const NEXT_PAGE_LABEL = 'Next page';
 /** The pagination region's accessible name. */
 export const PAGINATION_LABEL = 'Pagination';
 
-const SEARCH_ID = 'listing-search';
 const PAGE_NUMBER_ID = 'page-number-control';
 const PAGE_SIZE_ID = 'page-size-control';
 
@@ -108,8 +130,6 @@ export interface ListingProps {
   readonly qs: QueryState;
   /** The calendar the surfaces render and the toggle reads (Requirements 14.18, 16.3). */
   readonly calendar: CalendarState;
-  /** Search-field input: the debounced, replacing address write (Requirement 8.8). */
-  readonly onQuery: (raw: string) => void;
   /** A discrete Query_State change: one history entry (Requirement 8.1). */
   readonly onCommit: (qs: QueryState) => void;
   /** A calendar transition: the shell re-derives against the new schedule (15.8). */
@@ -123,14 +143,32 @@ export function Listing({
   view,
   qs,
   calendar,
-  onQuery,
   onCommit,
   onCalendarState,
   onOpenTeam,
   calendarStore,
 }: ListingProps) {
   const queryTerms = terms(qs.query);
-  const goToPage = (pageNumber: number) => onCommit({ ...qs, pageNumber });
+
+  /** The top of the results region: the toolbar that heads it. */
+  const resultsRef = useRef<HTMLDivElement | null>(null);
+
+  /**
+   * Brings the head of the results region into view after a paging change. Guarded
+   * because `scrollIntoView` is absent in jsdom and in any engine without it, and a
+   * paging change must land regardless of whether the view can be scrolled.
+   */
+  const revealResults = () => {
+    const region = resultsRef.current;
+    if (typeof region?.scrollIntoView === 'function') {
+      region.scrollIntoView({ block: 'start' });
+    }
+  };
+
+  const goToPage = (pageNumber: number) => {
+    onCommit({ ...qs, pageNumber });
+    revealResults();
+  };
 
   return (
     <main class="listing">
@@ -140,59 +178,95 @@ export function Listing({
         {UNOFFICIAL_MIRROR_NOTICE}
       </p>
 
-      <div class="listing__search">
-        <label class="listing__search-label" for={SEARCH_ID}>
-          {SEARCH_LABEL}
-        </label>
-        <input
-          id={SEARCH_ID}
-          class="listing__search-input"
-          type="search"
-          value={qs.query}
-          onInput={event => onQuery(event.currentTarget.value)}
-        />
-      </div>
-
-      <SelectedValues qs={qs} onCommit={onCommit} />
-      <SortControl qs={qs} onCommit={onCommit} />
-      <FilterPanel facets={view.facets} qs={qs} onCommit={onCommit} />
-
-      {/* The calendar surfaces: the control that takes the file with its privacy
-          statement and its removal control, what is loaded now, and the toggle
-          (Requirements 14.1, 14.18, 16.1, 17.4, 17.6, 17.9). They sit with the
-          other controls that change the Result_Set and above the count they
-          change, and the toggle keeps one instance per listing so a change to it
-          leaves focus where it was (Requirement 11.12). */}
-      <div class="listing__calendar" data-testid="listing-calendar">
-        <CalendarControl
+      {/* The filter rail: the Filter_Panel and, above it, the collapsed calendar
+          disclosure (Requirements 19.8, 14.1). The calendar surfaces are here
+          rather than in the results column so the upload displaces no Team_Card,
+          and one wrapper is what the sidebar layout floats, so both stick and
+          scroll together. */}
+      <div class="filter-rail" data-testid="filter-rail">
+        <CalendarDisclosure
           state={calendar}
           onState={onCalendarState}
           store={calendarStore}
         />
-        <CalendarStatus state={calendar} />
+        {/* Requirement 19.8: the Filter_Panel itself from 1000 CSS pixels up, and
+            behind the control that states the selected-value count below that. */}
+        <FilterDrawer facets={view.facets} qs={qs} onCommit={onCommit} />
+      </div>
+
+      {/* The results toolbar: what the Result_Set is, and every control that
+          changes it, in one place directly above the grid. */}
+      <div
+        class="listing__toolbar"
+        ref={resultsRef}
+        data-testid="listing-toolbar"
+      >
+        <div class="listing__tally">
+          {/* Requirements 11.4, 11.12: the count lives in a live region, so every
+              Result_Set change announces it — zero included — without focus
+              moving. */}
+          <p
+            class="listing__count"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            data-testid="result-count"
+          >
+            {matchCountText(view.totalCount)}
+          </p>
+
+          <p class="listing__position" data-testid="page-position">
+            {pagePositionText(view.pageNumber, view.pageCount)}
+          </p>
+        </div>
+
+        {/* Requirements 7.1, 7.4: the Sort_Option, every option offered. */}
+        <SortControl qs={qs} onCommit={onCommit} />
+
+        {/* Requirements 4.4, 4.9: one of the four sizes, and the page returns to
+            1 with it, since a size change is not a Result_Set change and so
+            `derive` will not reset it. */}
+        <div class="listing__page-size">
+          <label class="listing__size-label" for={PAGE_SIZE_ID}>
+            {PAGE_SIZE_LABEL}
+          </label>
+          <select
+            id={PAGE_SIZE_ID}
+            class="listing__size-select"
+            value={String(qs.pageSize)}
+            onChange={event => {
+              const raw = event.currentTarget.value;
+              const pageSize: PageSize =
+                raw === 'all' ? 'all' : (Number(raw) as PageSize);
+              onCommit({ ...qs, pageSize, pageNumber: DEFAULT_PAGE_NUMBER });
+              revealResults();
+            }}
+          >
+            {PAGE_SIZE_OPTIONS.map(size => (
+              <option key={String(size)} value={String(size)}>
+                {pageSizeLabel(size)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Requirements 16.1, 16.3, 16.4: the toggle sits beside the sort control
+            rather than with the calendar surfaces, because what it changes is the
+            Result_Set on screen and not the Busy_Schedule. One instance per
+            listing, so a change to it leaves focus where it was
+            (Requirement 11.12). */}
         <HideConflictsToggle
           qs={qs}
           calendar={calendar}
           hiddenByToggle={view.hiddenByToggle}
           onCommit={onCommit}
         />
+
+        {/* Requirements 5.6, 6.8, 6.9, 16.7: what is currently narrowing the
+            listing, each value removable on its own, and the one clear-all control
+            beside them. It renders nothing at all while nothing is narrowing. */}
+        <SelectedValues qs={qs} onCommit={onCommit} />
       </div>
-
-      {/* Requirements 11.4, 11.12: the count lives in a live region, so every
-          Result_Set change announces it — zero included — without focus moving. */}
-      <p
-        class="listing__count"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        data-testid="result-count"
-      >
-        {matchCountText(view.totalCount)}
-      </p>
-
-      <p class="listing__position" data-testid="page-position">
-        {pagePositionText(view.pageNumber, view.pageCount)}
-      </p>
 
       {view.page.length > 0 && (
         <ul class="listing__cards" data-testid="listing-cards">
@@ -251,29 +325,6 @@ export function Listing({
         >
           {NEXT_PAGE_LABEL}
         </button>
-
-        {/* Requirements 4.4, 4.9: one of the four sizes, and the page returns to
-            1 with it, since a size change is not a Result_Set change. */}
-        <label class="listing__size-label" for={PAGE_SIZE_ID}>
-          {PAGE_SIZE_LABEL}
-        </label>
-        <select
-          id={PAGE_SIZE_ID}
-          class="listing__size-select"
-          value={String(qs.pageSize)}
-          onChange={event => {
-            const raw = event.currentTarget.value;
-            const pageSize: PageSize =
-              raw === 'all' ? 'all' : (Number(raw) as PageSize);
-            onCommit({ ...qs, pageSize, pageNumber: DEFAULT_PAGE_NUMBER });
-          }}
-        >
-          {PAGE_SIZE_OPTIONS.map(size => (
-            <option key={String(size)} value={String(size)}>
-              {pageSizeLabel(size)}
-            </option>
-          ))}
-        </select>
       </nav>
     </main>
   );

@@ -59,12 +59,12 @@ describe('parseTeamPage', () => {
       {
         name: 'Brent Wagner',
         affiliation: 'Georgia Tech Research Institute',
-        email: 'brent.wagner@gtri.gatech.edu',
+        email: '',
       },
       {
         name: 'Ada Lovelace',
         affiliation: 'School of Mathematics',
-        email: 'ada@gatech.edu',
+        email: '',
       },
     ]);
     expect(record?.meetingWindow).toEqual([
@@ -92,7 +92,7 @@ describe('parseTeamPage', () => {
       {
         name: 'Solo Advisor',
         affiliation: 'School of ECE',
-        email: 'solo@gatech.edu',
+        email: '',
       },
     ]);
     expect(record?.meeting).toEqual({
@@ -135,9 +135,9 @@ describe('parseTeamPage', () => {
     const { record } = parseTeamPage(page(body), CANONICAL);
 
     expect(record?.advisors).toEqual([
-      { name: 'A One', affiliation: 'Aff One', email: 'a@gatech.edu' },
+      { name: 'A One', affiliation: 'Aff One', email: '' },
       { name: 'No Link Person', affiliation: 'Aff Two', email: '' },
-      { name: 'C Three', affiliation: 'Aff Three', email: 'c@gatech.edu' },
+      { name: 'C Three', affiliation: 'Aff Three', email: '' },
     ]);
   });
 

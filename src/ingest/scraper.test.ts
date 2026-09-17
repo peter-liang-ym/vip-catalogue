@@ -2,8 +2,12 @@
  * Unit tests for the Scraper request engine (Requirements 1.3, 1.4).
  *
  * A virtual clock stands in for wall time: `sleep` advances the clock and returns
- * immediately, so the 1s/2s/4s backoff and the 2-per-second pacing are asserted
+ * immediately, so the 1s/2s/4s backoff and the 30-second crawl delay are asserted
  * from recorded timestamps rather than waited out.
+ *
+ * The backoff tests below pace with `NO_PACING`, because the retry wait and the
+ * crawl delay both land in `clock.sleeps` and asserting the backoff sequence means
+ * reading it without the delay interleaved. Pacing has its own test.
  */
 
 import { describe, expect, it } from 'vitest';
@@ -13,6 +17,7 @@ import {
   DEFAULT_SCRAPER_CONFIG,
   fetchImage,
   fetchTeamPages,
+  USER_AGENT,
   type Clock,
   type FetchResult,
 } from './scraper';
@@ -37,6 +42,9 @@ function virtualClock(): VirtualClock {
 
 const readText = (response: Response): Promise<string> => response.text();
 
+/** A zero-length window never fills, so the pacer never sleeps. */
+const NO_PACING = { windowMs: 0 } as const;
+
 describe('createRequestRunner', () => {
   it('returns the body on a first-attempt success', async () => {
     const runner = createRequestRunner({
@@ -59,6 +67,7 @@ describe('createRequestRunner', () => {
     let calls = 0;
     const runner = createRequestRunner({
       clock,
+      config: NO_PACING,
       fetch: () => {
         calls += 1;
         return Promise.resolve(new Response('', { status: 503 }));
@@ -82,6 +91,7 @@ describe('createRequestRunner', () => {
     let calls = 0;
     const runner = createRequestRunner({
       clock,
+      config: NO_PACING,
       fetch: () => {
         calls += 1;
         return Promise.resolve(
@@ -152,7 +162,7 @@ describe('createRequestRunner', () => {
     expect(DEFAULT_SCRAPER_CONFIG.requestTimeoutMs).toBe(30_000);
   });
 
-  it('sends at most 2 requests within any 1 second window', async () => {
+  it('holds to the crawl delay the source site asks for', async () => {
     const clock = virtualClock();
     const starts: number[] = [];
     const runner = createRequestRunner({
@@ -167,13 +177,37 @@ describe('createRequestRunner', () => {
       await runner.request(`https://vip.gatech.edu/teams/entry/${i}`, readText);
     }
 
+    const { maxRequestsPerWindow, windowMs } = DEFAULT_SCRAPER_CONFIG;
     expect(starts).toHaveLength(7);
     for (const start of starts) {
       const inWindow = starts.filter(
-        other => other >= start && other - start < 1000,
+        other => other >= start && other - start < windowMs,
       );
-      expect(inWindow.length).toBeLessThanOrEqual(2);
+      expect(inWindow.length).toBeLessThanOrEqual(maxRequestsPerWindow);
     }
+  });
+
+  it('defaults to the 30 second crawl delay from the source robots.txt', () => {
+    expect(DEFAULT_SCRAPER_CONFIG.maxRequestsPerWindow).toBe(1);
+    expect(DEFAULT_SCRAPER_CONFIG.windowMs).toBe(30_000);
+  });
+
+  it('identifies itself with a contactable user agent on every request', async () => {
+    const seen: (string | undefined)[] = [];
+    const runner = createRequestRunner({
+      clock: virtualClock(),
+      config: NO_PACING,
+      fetch: (_url, init) => {
+        seen.push(new Headers(init.headers).get('user-agent') ?? undefined);
+        return Promise.resolve(new Response('', { status: 503 }));
+      },
+    });
+
+    await runner.request('https://vip.gatech.edu/', readText);
+
+    // Every attempt, retries included.
+    expect(seen).toHaveLength(4);
+    expect(new Set(seen)).toEqual(new Set([USER_AGENT]));
   });
 });
 
@@ -313,6 +347,7 @@ describe('fetchImage', () => {
     const clock = virtualClock();
     const runner = createRequestRunner({
       clock,
+      config: NO_PACING,
       fetch: () => Promise.resolve(new Response('', { status: 500 })),
     });
 

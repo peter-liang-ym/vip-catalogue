@@ -12,13 +12,15 @@ import { serialize } from '../ingest/serialize';
 import type { BusySchedule, TeamRecord } from '../shared/types';
 import { App } from './app';
 import { BUSY_SCHEDULE_KEY, saveStoredSchedule } from './busyScheduleStore';
-import { REMOVE_CALENDAR_LABEL } from './components/CalendarControl';
+import { REMOVE_CALENDAR_LABEL } from './components/CalendarDisclosure';
 import { NOT_RESTORED_MESSAGE } from './components/CalendarStatus';
 import {
   HIDE_CONFLICTS_LABEL,
   NO_CALENDAR_MESSAGE,
 } from './components/HideConflictsToggle';
 import { CONFLICT_TEXT } from './components/TeamCard';
+import { THEME_LABELS } from './components/ThemeToggle';
+import { loadTheme } from './themeStore';
 
 function record(entryId: string, name: string): TeamRecord {
   return {
@@ -158,7 +160,10 @@ async function goBack(): Promise<void> {
   await popped;
 }
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  delete document.documentElement.dataset.theme;
+});
 
 describe('App', () => {
   it('applies the Query_State in the address before the first render (Requirement 8.2)', async () => {
@@ -385,6 +390,62 @@ describe('App', () => {
       NO_CALENDAR_MESSAGE,
     );
     expect(address()).toBe('/?hc=1');
+  });
+
+  it('applies a theme change without reloading, leaving the Query_State and the loaded Busy_Schedule in place (Requirements 18.3, 18.9)', async () => {
+    const store = storedSchedule();
+    await mountWithStore('/?page=2', store);
+    const entries = history.length;
+
+    fireEvent.click(screen.getByLabelText(THEME_LABELS.dark));
+
+    // The theme is applied through the one attribute the stylesheet reads.
+    expect(document.documentElement.dataset.theme).toBe('dark');
+    expect(loadTheme(store)).toBe('dark');
+
+    // And nothing else moved: not the address, not the history, not the page,
+    // not the Result_Set, and not the restored schedule.
+    expect(address()).toBe('/?page=2');
+    expect(history.length).toBe(entries);
+    expect(pagePosition()).toBe('Page 2 of 2');
+    expect(resultCount()).toBe('30 matching teams');
+    expect(screen.getByTestId('calendar-status-file').textContent).toContain(
+      'spring-2026.ics',
+    );
+    expect(store.getItem(BUSY_SCHEDULE_KEY)).not.toBeNull();
+    expect(hideConflictsToggle().checked).toBe(false);
+  });
+
+  it('shows a loading indicator and no card, failure message, or retry while the Dataset loads (Requirement 12.4)', async () => {
+    // A request that never settles until this test lets it, so the loading state
+    // is observable rather than a frame that has already passed.
+    let release = (): void => {};
+    const pending = new Promise<Response>(resolve => {
+      release = () => resolve(new Response(DATASET_JSON, { status: 200 }));
+    });
+    const fetchImpl = (async (_input: RequestInfo | URL) =>
+      pending) as typeof globalThis.fetch;
+
+    history.replaceState(null, '', '/?q=team+03');
+    render(<App fetch={fetchImpl} />);
+
+    // The indication is the whole of what renders: no Team_Card, no count, no
+    // failure message, and nothing to retry.
+    expect(await screen.findByRole('status')).toHaveProperty(
+      'textContent',
+      'Loading teams…',
+    );
+    expect(screen.queryByTestId('result-count')).toBeNull();
+    expect(screen.queryByText('Team 03')).toBeNull();
+    expect(screen.queryByText('The team data failed to load.')).toBeNull();
+    expect(screen.queryByText('Try again')).toBeNull();
+
+    // Requirement 8.2: the Query_State the address carries is untouched by the
+    // load, so the indicator is not a route of its own.
+    expect(address()).toBe('/?q=team+03');
+
+    release();
+    await screen.findByTestId('result-count');
   });
 
   it('renders the failure message and a retry control, keeping the address (Requirements 12.5, 12.6)', async () => {

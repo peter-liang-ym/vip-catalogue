@@ -26,6 +26,7 @@
  * times on the cards without changing frames.
  */
 
+import type { ComponentChildren } from 'preact';
 import type { BusySchedule } from '../../shared/types';
 import {
   scheduleOf,
@@ -135,10 +136,24 @@ export function noticeMessage(notice: CalendarNotice): string | null {
 export interface CalendarStatusProps {
   /** The whole calendar state; both halves of this component read from it. */
   readonly state: CalendarState;
+  /**
+   * Affordances that act on the schedule being summarized — removal, and anything
+   * else that only makes sense once one is loaded. They render on the summary line
+   * itself, and only while a Busy_Schedule is there to act on
+   * (Requirements 17.4, 17.6), which is why they are handed here rather than
+   * placed beside this component.
+   */
+  readonly children?: ComponentChildren;
 }
 
 /** The Busy_Schedule details, rendered whenever one is loaded (Requirement 14.18). */
-function ScheduleDetails({ schedule }: { readonly schedule: BusySchedule }) {
+function ScheduleDetails({
+  schedule,
+  children,
+}: {
+  readonly schedule: BusySchedule;
+  readonly children?: ComponentChildren;
+}) {
   return (
     <div
       class="calendar-status__schedule"
@@ -153,11 +168,12 @@ function ScheduleDetails({ schedule }: { readonly schedule: BusySchedule }) {
       <p class="calendar-status__loaded" data-testid="calendar-status-loaded">
         {loadTimeText(schedule.loadedAt)}
       </p>
+      {children}
     </div>
   );
 }
 
-export function CalendarStatus({ state }: CalendarStatusProps) {
+export function CalendarStatus({ state, children }: CalendarStatusProps) {
   const schedule = scheduleOf(state);
   const notice =
     state.kind === 'loaded' || state.kind === 'error' ? state.notice : null;
@@ -182,11 +198,13 @@ export function CalendarStatus({ state }: CalendarStatusProps) {
 
   return (
     <div class="calendar-status" data-calendar-state={state.kind}>
-      {schedule !== null && <ScheduleDetails schedule={schedule} />}
+      {schedule !== null && (
+        <ScheduleDetails schedule={schedule}>{children}</ScheduleDetails>
+      )}
 
       {retainedBlocks !== null && (
         <p
-          class="calendar-status__notice"
+          class="calendar-status__notice notice"
           role="status"
           data-testid="calendar-status-truncated"
         >
@@ -196,7 +214,7 @@ export function CalendarStatus({ state }: CalendarStatusProps) {
 
       {notSaved && (
         <p
-          class="calendar-status__notice"
+          class="calendar-status__notice notice"
           role="status"
           data-testid="calendar-status-not-saved"
         >
@@ -209,7 +227,7 @@ export function CalendarStatus({ state }: CalendarStatusProps) {
         // announced rather than left to be noticed, like the Dataset failure
         // message.
         <p
-          class="calendar-status__notice"
+          class="calendar-status__notice notice"
           role={state.kind === 'error' ? 'alert' : 'status'}
           data-testid="calendar-status-message"
         >

@@ -36,6 +36,13 @@ import { CONFLICT_TEXT } from './TeamCard';
 /** Requirement 9.3: the official VIP application page, as the Source_Site links it. */
 export const APPLICATION_URL = 'https://vip.gatech.edu/application/';
 
+/**
+ * Where an Advisor address would have been. Names the destination and says what
+ * is there, so a visitor looking for contact details knows one click reaches them.
+ */
+export const ADVISOR_CONTACT_TEXT =
+  'Advisor contact details are on the official VIP team page';
+
 /** The two fixed links (Requirement 9.3). Each names where it goes, not "click here". */
 export const SOURCE_LINK_TEXT = 'View this team on the official VIP site';
 export const APPLICATION_LINK_TEXT = 'Apply to VIP on the official VIP site';
@@ -214,33 +221,28 @@ export function TeamDetail({ team, conflictState, children }: TeamDetailProps) {
       />
 
       {/* Requirement 9.2: every Advisor entry, with its name and affiliation.
-          Requirement 9.7: the mail link appears exactly where an email does. */}
+          Advisor addresses are not published (see `parseAdvisors` in the Parser),
+          so contact goes through the Source_Site page rather than a mail link. */}
       {team.advisors.length > 0 && (
         <section class="team-detail__section" data-field="advisors">
           <h2 class="team-detail__heading">{HEADINGS.advisors}</h2>
           <ul class="team-detail__advisors">
             {team.advisors.map(advisor => (
-              <li
-                class="team-detail__advisor"
-                key={`${advisor.name}:${advisor.email}`}
-              >
+              <li class="team-detail__advisor" key={advisor.name}>
                 <span class="team-detail__advisor-name">{advisor.name}</span>
                 {advisor.affiliation !== '' && (
                   <span class="team-detail__advisor-affiliation">
                     {advisor.affiliation}
                   </span>
                 )}
-                {advisor.email !== '' && (
-                  <a
-                    class="team-detail__advisor-email"
-                    href={`mailto:${advisor.email}`}
-                  >
-                    {advisor.email}
-                  </a>
-                )}
               </li>
             ))}
           </ul>
+          <p class="team-detail__advisor-contact">
+            <a href={team.sourceUrl} rel="noreferrer">
+              {ADVISOR_CONTACT_TEXT}
+            </a>
+          </p>
         </section>
       )}
 

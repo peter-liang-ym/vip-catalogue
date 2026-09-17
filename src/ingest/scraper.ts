@@ -11,9 +11,15 @@
  * Pacing is a token bucket over a sliding window: the runner keeps the start
  * times of the most recent `maxRequestsPerWindow` requests and waits out the
  * oldest one whenever the window is full. A sliding window is what the
- * requirement asks for ("within any 1-second window"), which a fixed window
+ * requirement asks for ("within any N-second window"), which a fixed window
  * would not give — two requests at the end of one fixed bucket and two at the
- * start of the next are four inside one second.
+ * start of the next are four inside one window.
+ *
+ * The default is one request per 30 seconds because that is the `Crawl-delay: 30`
+ * the Source_Site states in its `robots.txt` for `User-agent: *`. The bound the
+ * Source_Site asks for wins over the faster one this engine can sustain: a full
+ * run of ~110 pages then takes about an hour, which is unremarkable for a job a
+ * maintainer runs occasionally and out of band.
  *
  * `Clock` and `fetch` are injected so the whole engine can be driven by a
  * virtual clock and in-memory responses; nothing here waits in real time except
@@ -41,15 +47,26 @@ export interface ScraperConfig {
   readonly requestTimeoutMs: number;
   readonly maxRetries: number;
   readonly initialBackoffMs: number;
+  /** Sent on every request so the Source_Site can identify and reach the operator. */
+  readonly userAgent: string;
 }
 
-/** The Requirement 1.3 and 1.4 numbers: 2 per second, 30s, 3 retries from 1s. */
+/**
+ * Identifies the job and gives the Source_Site a way to reach whoever runs it,
+ * which a default runtime agent string does not. Replace the contact before
+ * running against the live site.
+ */
+export const USER_AGENT =
+  'vip-teams-search/1.0 (student project; contact: REPLACE_WITH_YOUR_GT_EMAIL)';
+
+/** The Requirement 1.3 and 1.4 numbers: 1 per 30s, 30s timeout, 3 retries from 1s. */
 export const DEFAULT_SCRAPER_CONFIG: ScraperConfig = {
-  maxRequestsPerWindow: 2,
-  windowMs: 1000,
+  maxRequestsPerWindow: 1,
+  windowMs: 30_000,
   requestTimeoutMs: 30_000,
   maxRetries: 3,
   initialBackoffMs: 1000,
+  userAgent: USER_AGENT,
 };
 
 /** Wall-clock implementation used by the real Ingestion_Job. */
@@ -166,6 +183,7 @@ export function createRequestRunner(deps: ScraperDeps = {}): RequestRunner {
     try {
       const response = await fetchFn(url, {
         signal: AbortSignal.timeout(config.requestTimeoutMs),
+        headers: { 'User-Agent': config.userAgent },
       });
       if (response.status !== 200) {
         return {

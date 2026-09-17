@@ -4,7 +4,12 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { TeamRecord } from '../../shared/types';
 import { terms } from '../search';
-import { CONFLICT_TEXT, GOALS_EXCERPT_LENGTH, TeamCard } from './TeamCard';
+import {
+  CONFLICT_TEXT,
+  GOALS_EXCERPT_LENGTH,
+  goalsExcerpt,
+  TeamCard,
+} from './TeamCard';
 
 function record(overrides: Partial<TeamRecord> = {}): TeamRecord {
   return {
@@ -91,21 +96,52 @@ describe('TeamCard', () => {
 
     fireEvent.error(screen.getByRole('img'));
 
-    const placeholder = screen.getByTestId('team-card-image-placeholder');
-    expect(placeholder.getAttribute('aria-label')).toBe(
-      'A robot playing a marimba',
-    );
+    // Still an image to assistive technology, still named by the record's alt
+    // text, and carrying the team's first character rather than being an empty
+    // bordered box.
+    const placeholder = screen.getByRole('img', {
+      name: 'A robot playing a marimba',
+    });
+    expect(placeholder.textContent).toBe('R');
+    // The character is decoration: the element's own label is its accessible
+    // name, so the character is hidden rather than read a second time.
+    expect(screen.getByText('R').getAttribute('aria-hidden')).toBe('true');
     expect(screen.getByRole('link').textContent).toBe('Robotic Musicianship');
     expect(text('team-card-goals')).toContain('Build robots');
     expect(text('team-card-colleges')).toContain('Engineering');
     expect(text('team-card-meeting')).toContain('9:30-10:20');
   });
 
-  it('renders at most the first 200 characters of the goals text (Requirement 4.2)', () => {
-    const goals = 'g'.repeat(250);
+  it('renders the whole goals text when it is within the bound (Requirement 4.2)', () => {
+    mount();
+
+    expect(text('team-card-goals')).toBe(
+      'Build robots that improvise music with human players.',
+    );
+  });
+
+  it('ends a cut goals excerpt on a word boundary with an ellipsis, within 200 characters (Requirement 4.2)', () => {
+    const goals = `${'word '.repeat(60)}tail`;
     mount({ team: record({ goals }) });
 
-    expect(text('team-card-goals')).toBe('g'.repeat(GOALS_EXCERPT_LENGTH));
+    const excerpt = text('team-card-goals');
+    expect(excerpt.length).toBeLessThanOrEqual(GOALS_EXCERPT_LENGTH);
+    expect(excerpt.endsWith('word…')).toBe(true);
+    expect(goals.startsWith(excerpt.slice(0, -1))).toBe(true);
+  });
+
+  it('cuts at the bound when the goals text has no word boundary inside it (Requirement 4.2)', () => {
+    mount({ team: record({ goals: 'g'.repeat(250) }) });
+
+    expect(text('team-card-goals')).toBe(
+      `${'g'.repeat(GOALS_EXCERPT_LENGTH - 1)}…`,
+    );
+  });
+
+  it('leaves goals text at exactly the bound uncut (Requirement 4.2)', () => {
+    const goals = 'g'.repeat(GOALS_EXCERPT_LENGTH);
+
+    expect(goalsExcerpt(goals)).toBe(goals);
   });
 
   it('lists each distinct College exactly once (Requirement 4.2)', () => {

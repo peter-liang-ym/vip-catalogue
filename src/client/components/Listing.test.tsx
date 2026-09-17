@@ -1,24 +1,34 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen } from '@testing-library/preact';
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from '@testing-library/preact';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { BusySchedule, Dataset, TeamRecord } from '../../shared/types';
 import { NO_CALENDAR, scheduleOf, type CalendarState } from '../calendarState';
 import { derive, type DerivedView } from '../derive';
 import { DEFAULT_QUERY_STATE, type QueryState } from '../queryState';
 import { buildIndex } from '../search';
+import { CALENDAR_CONTROL_LABEL } from './CalendarControl';
 import {
-  CALENDAR_CONTROL_LABEL,
+  CALENDAR_DISCLOSURE_LABEL,
   REMOVE_CALENDAR_LABEL,
-} from './CalendarControl';
+} from './CalendarDisclosure';
 import { HIDE_CONFLICTS_LABEL } from './HideConflictsToggle';
 import {
   Listing,
   matchCountText,
   PAGE_NUMBER_LABEL,
   PAGE_SIZE_LABEL,
+  PAGINATION_LABEL,
   UNOFFICIAL_MIRROR_NOTICE,
 } from './Listing';
+import { CLEAR_ALL_LABEL } from './SelectedValues';
+import { SORT_CONTROL_LABEL } from './SortControl';
 
 function record(entryId: string, name: string): TeamRecord {
   return {
@@ -97,7 +107,6 @@ function mount(
   const index = buildIndex(dataset(teams));
   const view: DerivedView = derive(index, qs, scheduleOf(calendar));
   const onCommit = vi.fn();
-  const onQuery = vi.fn();
   const onOpenTeam = vi.fn();
   const onCalendarState = vi.fn();
 
@@ -106,20 +115,25 @@ function mount(
       view={view}
       qs={qs}
       calendar={calendar}
-      onQuery={onQuery}
       onCommit={onCommit}
       onCalendarState={onCalendarState}
       onOpenTeam={onOpenTeam}
     />,
   );
 
-  return { view, onCommit, onQuery, onOpenTeam, onCalendarState };
+  return { view, onCommit, onOpenTeam, onCalendarState };
 }
 
+/**
+ * The Team_Cards on screen, in order, read through the link each card's name is
+ * rather than through the card's markup: every Team_Card links to its
+ * Team_Detail_View, and nothing else on the listing does.
+ */
 function cardNames(): readonly string[] {
-  return [...screen.getByTestId('listing-cards').children].map(
-    card => card.querySelector('.team-card__name')?.textContent ?? '',
-  );
+  return screen
+    .queryAllByRole('link')
+    .filter(link => (link.getAttribute('href') ?? '').startsWith('/team/'))
+    .map(link => link.textContent ?? '');
 }
 
 afterEach(cleanup);
@@ -266,16 +280,6 @@ describe('Listing', () => {
     expect(screen.queryByTestId('listing-cards')).toBeNull();
   });
 
-  it('reports search-field input to the shell', () => {
-    const { onQuery } = mount();
-
-    fireEvent.input(screen.getByLabelText('Search teams'), {
-      target: { value: 'robot' },
-    });
-
-    expect(onQuery).toHaveBeenCalledWith('robot');
-  });
-
   it('opens the team whose card was activated', () => {
     const { onOpenTeam } = mount();
 
@@ -343,5 +347,65 @@ describe('Listing', () => {
     mount(queryState({ hideConflicts: true }), TEAMS, LOADED);
 
     expect(screen.getAllByLabelText(HIDE_CONFLICTS_LABEL)).toHaveLength(1);
+  });
+
+  describe('the results toolbar', () => {
+    /** The region directly above the grid that reports on and narrows it. */
+    function toolbar(): HTMLElement {
+      return screen.getByTestId('listing-toolbar');
+    }
+
+    it('carries the count, the page position, the sort control, the page size, and the toggle (Requirements 4.1, 7.1, 4.4, 16.1)', () => {
+      mount(queryState(), TEAMS, LOADED);
+      const region = toolbar();
+
+      expect(within(region).getByText(matchCountText(30))).toBeTruthy();
+      expect(within(region).getByText('Page 1 of 2')).toBeTruthy();
+      expect(within(region).getByLabelText(SORT_CONTROL_LABEL)).toBeTruthy();
+      expect(within(region).getByLabelText(PAGE_SIZE_LABEL)).toBeTruthy();
+      expect(within(region).getByLabelText(HIDE_CONFLICTS_LABEL)).toBeTruthy();
+    });
+
+    it('sits above the first Team_Card (Requirements 4.1, 10.1)', () => {
+      mount();
+
+      expect(
+        toolbar().compareDocumentPosition(screen.getByTestId('listing-cards')) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
+    it('carries the clear-all control beside what is narrowing the listing (Requirements 5.6, 6.8, 16.7)', () => {
+      mount(queryState({ query: 'team' }));
+
+      expect(
+        within(toolbar()).getByRole('button', { name: CLEAR_ALL_LABEL }),
+      ).toBeTruthy();
+    });
+
+    it('leaves the page-number control in the pager at the foot of the page (Requirement 4.5)', () => {
+      mount();
+
+      const pager = screen.getByRole('navigation', { name: PAGINATION_LABEL });
+      expect(within(pager).getByLabelText(PAGE_NUMBER_LABEL)).toBeTruthy();
+      expect(within(toolbar()).queryByLabelText(PAGE_NUMBER_LABEL)).toBeNull();
+      // The pager follows the grid; the toolbar precedes it.
+      expect(
+        screen.getByTestId('listing-cards').compareDocumentPosition(pager) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
+    it('keeps the Calendar_File control in the filter rail, out of the results column (Requirement 14.1)', () => {
+      mount();
+
+      const rail = screen.getByTestId('filter-rail');
+      expect(within(rail).getByText(CALENDAR_DISCLOSURE_LABEL)).toBeTruthy();
+      expect(
+        within(toolbar()).queryByText(CALENDAR_DISCLOSURE_LABEL),
+      ).toBeNull();
+      // The rail carries the Filter_Panel too, so both stick together.
+      expect(within(rail).getByLabelText(CALENDAR_CONTROL_LABEL)).toBeTruthy();
+    });
   });
 });

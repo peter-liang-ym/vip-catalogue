@@ -1,0 +1,352 @@
+/*
+ * Base element styles, the site chrome, the shared notice, and the freshness
+ * notices.
+ *
+ * Everything here consumes the tokens from `tokens.css`; no token is redefined.
+ * Only element selectors and the `site`, `notice`, `listing__notice`, and
+ * `freshness` blocks appear below — the reusable devices live in
+ * `primitives.css` and the per-view surfaces in their own files.
+ *
+ * The identity is neutral and tool-like: a near-white or near-black page field,
+ * one system face, hairline boundaries, and one indigo accent that is
+ * deliberately not an Institute color. No Institute mark is referenced, and no
+ * heading here names the Institute.
+ *
+ * Headings carry no rule beneath them. The hairline under every heading belonged
+ * to the retired palette, where a gold rule was the identity's signature; on a
+ * neutral field it draws a boundary where none is meant, so size and weight
+ * separate a heading from its text and the tracking is left alone.
+ *
+ * The masthead is the lockup: the site name, the search field as the primary
+ * action, and the theme control, over the unofficial-mirror notice
+ * (Requirement 10.1) as its bottom band, so a visitor reads "unofficial mirror"
+ * as part of the site's name rather than as a footnote under it. The notice stays
+ * in the listing's markup, above the first Team_Card, which is where
+ * Requirement 10.1 puts it; the band is how it reads as masthead.
+ */
+
+/* ---------------------------------------------------------------- elements */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: var(--text-root);
+  /* The page field extends past the content, so a short page is still the
+     page rather than a bare surface below the footer. */
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-text-size-adjust: 100%;
+}
+
+/*
+ * Density is the tone: no element carries default vertical margin, and space is
+ * spent between field groups by the blocks that own them.
+ */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding-left: var(--space-5);
+}
+
+/* Headings: the type scale, tight leading, normal tracking, and no rule beneath.
+   Size and weight are the whole separation — a hairline under a heading reads as
+   a boundary, and a heading bounds nothing. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  letter-spacing: normal;
+  color: var(--ink);
+}
+
+h1 {
+  font-size: var(--text-2xl);
+}
+
+h2 {
+  font-size: var(--text-xl);
+}
+
+h3 {
+  font-size: var(--text-lg);
+}
+
+h4 {
+  font-size: var(--text-md);
+}
+
+h5,
+h6 {
+  font-size: var(--text-base);
+}
+
+/*
+ * Links: `--accent` carries them, and the underline is persistent rather than
+ * hover-revealed, so the link is identifiable without color alone and without a
+ * pointer.
+ */
+a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.15em;
+}
+
+a:hover,
+a:active {
+  color: var(--ink);
+  text-decoration-thickness: 2px;
+}
+
+/* Search-term highlight: `--highlight` fill under `--highlight-ink`, which clears
+   4.5:1 where the surrounding text does, in either theme. */
+mark {
+  background: var(--highlight);
+  color: var(--highlight-ink);
+  /* Enough padding to read as a fill, not enough to reflow the line. */
+  padding: 0 0.1em;
+}
+
+/* Meeting times, clock ranges, entry ids, and facet counts: tabular figures in
+   the one UI face, so digits share an advance width and columns of numbers line
+   up without a second typeface. */
+code,
+kbd,
+samp,
+pre,
+time {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Controls inherit the page's type rather than the platform's. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* ------------------------------------------------------------ site chrome */
+
+.site {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/*
+ * The masthead: the lockup row — the site name and the theme control at either
+ * end — over the search field, bounded below by one hairline. Flat and bordered
+ * rather than shadowed, and no rule inside it: the row and the field are one
+ * block, and the notice band below carries the only other edge.
+ */
+.site__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--bg);
+  border-bottom: var(--border-width) solid var(--border-strong);
+  padding: var(--space-4) var(--space-5);
+}
+
+/* The site name and the theme control: one row, wrapping rather than shrinking,
+   in the order the markup gives them (Requirement 11.1). */
+.site__masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.site__nav {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.site__brand {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  /* The site name is the site, not a link to read about it: full-contrast ink,
+     and the underline appears on interaction where it aids the pointer. */
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site__brand:hover,
+.site__brand:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/*
+ * The search field, promoted into the masthead as the primary action: a label over
+ * a field that spans the masthead. It is the one control the whole catalog answers
+ * to, and at a 26rem cap it read as one more control of the same weight as a facet
+ * heading; full width is what states which action the page is for. The label is
+ * sentence case in `--ink-muted` — small-caps letterspaced labels are the
+ * Team_Detail_View's density now, not every control's.
+ */
+.site__search {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.site__search-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+  color: var(--ink-muted);
+}
+
+.site__search-input {
+  width: 100%;
+}
+
+/*
+ * Requirement 10.1. The masthead's bottom band: set immediately under the header,
+ * sharing its inline padding, so it reads as part of the lockup. Sentence case in
+ * full-contrast ink — this is the one notice a visitor must not skim past — and it
+ * keeps its place above the first Team_Card and above the rest of the listing.
+ */
+.listing__notice {
+  margin: 0 0 var(--space-8);
+  padding: var(--space-2) var(--space-5) var(--space-3);
+  border-bottom: var(--border-width) solid var(--border-strong);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--ink);
+}
+
+/* The footer sits at the bottom of a short page, not halfway up it. */
+.site__footer {
+  margin-top: auto;
+  padding: var(--space-6) var(--space-5);
+  border-top: var(--border-width) solid var(--border-strong);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+.site__attribution {
+  color: var(--ink-muted);
+  max-width: 70ch;
+}
+
+.site__source {
+  margin-top: var(--space-2);
+}
+
+/* --------------------------------------------------- the shared notice style */
+
+/*
+ * One notice style for every advisory message on the site, and every surface that
+ * has one now takes it: the out-of-date and unknown-currency notices here, the
+ * Dataset loading indicator and load-failure message in `load.css`, and every
+ * calendar message in `calendar.css` — the rejected file, the unreadable file, the
+ * file with nothing weekly in it, the parse that ran out of budget, the retained
+ * count, the schedule that could not be restored or could not be saved, and the
+ * toggle with no calendar to act on. Each of those elements carries `notice`
+ * alongside its own class and adds only what is genuinely its own, so there is one
+ * rule to change and nothing to drift from it.
+ *
+ * A notice is the flat bordered surface with its text and nothing else: no state
+ * color, since a notice is not a Conflict_State and one of the three hues would
+ * make an unreadable file look like a scheduling outcome, and no thickened edge,
+ * since the rail now means "a Busy_Schedule is loaded" and a notice would borrow
+ * that meaning.
+ *
+ * Because both themes define `--surface`, `--border-strong`, and `--ink`, this one
+ * rule is also what makes every message render correctly in either theme without a
+ * theme-specific selector anywhere in the component stylesheets.
+ *
+ * It displaces nothing. The notice is in the normal flow, sized by its own text,
+ * and is never fixed, absolutely positioned, or overlaid, so it renders beside the
+ * content it qualifies rather than in place of it — which is what lets
+ * Requirements 10.4 and 10.6 keep displaying the Result_Set by composition.
+ */
+.notice {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-surface);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--ink);
+  max-width: 80ch;
+}
+
+/* -------------------------------------------------------------- freshness */
+
+/*
+ * Requirements 10.3, 10.4, 10.6. Each case is a notice above the Result_Set:
+ * flat, bordered, in the normal flow, sized by its own text. Nothing here
+ * overlays or scrolls with the page, so the Result_Set is neither displaced nor
+ * obscured.
+ */
+.freshness {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0 var(--space-5) var(--space-6);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+}
+
+/* The timestamp is a fact about the data, stated quietly, with tabular figures
+   like every other number on the page. */
+.freshness__generated {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  color: var(--ink-muted);
+}
+
+/*
+ * The two qualifying notices are the shared notice style and nothing more: both
+ * carry `notice` in the markup, so neither has a treatment of its own and a third
+ * advisory message elsewhere on the site reads identically.
+ */

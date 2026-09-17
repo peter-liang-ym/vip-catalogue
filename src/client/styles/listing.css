@@ -1,0 +1,669 @@
+/*
+ * The listing surfaces: `TeamCard`, `Listing`, `FilterPanel`, `FilterDrawer`,
+ * `SelectedValues`, `SortControl`, and `EmptyState`.
+ *
+ * This is a per-view stylesheet, so it consumes tokens and composes the devices;
+ * it defines neither. Geometry that belongs to the shell — the card grid, the
+ * Filter_Panel sidebar, the gutters, the stack rhythm between the listing's
+ * blocks, and the wrapping rules — stays in `layout.css`, and the two places this
+ * file adjusts that rhythm do it the way `layout.css` asks, by overriding
+ * `margin-block-start` alone so the sidebar's inline inset survives.
+ *
+ * The unofficial-mirror notice (Requirement 10.1) is not restyled here: it is set
+ * as part of the masthead lockup in `base.css` and bled out to the shell's edges
+ * in `layout.css`, and it keeps its place in this markup above the first
+ * Team_Card. The focus ring, the 24px target floor, and the control boundaries are
+ * `controls.css`, once for every control below; nothing here restates or cancels
+ * them.
+ *
+ * Two devices are applied by class in the markup rather than restated here: the
+ * Team_Card carries `surface rail`, and the Filter value count carries `numeric`.
+ * The blocks that are not interactive — the empty state, the indicator chips —
+ * state the flat bordered surface in their own rules instead, the way the
+ * freshness notices in `base.css` do, because the `.surface` device also carries
+ * the hover affordance and these do not respond to a pointer.
+ */
+
+/* ----------------------------------------------------------- the Team_Card */
+
+/*
+ * The card is the flat bordered surface with the state rail: `surface rail` in
+ * the markup, so the fill, the hairline on three sides, the 3px left edge drawn
+ * only while a Busy_Schedule is loaded and colored from the `data-conflict`
+ * attribute on the Conflict_State paragraph, and the hover that darkens the border
+ * and saturates the rail all come from `primitives.css` and are the same devices
+ * the detail surfaces use.
+ *
+ * What is left to this rule is the card's own density: padding, and one gap
+ * between field groups rather than margins inside them. The gap is the only
+ * vertical whitespace on the card — every field group below sets none of its own —
+ * so the air is spent between groups, where it separates, rather than inside them,
+ * where it only makes the card taller.
+ */
+.team-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+/*
+ * `aspect-ratio` with `width: 100%` reserves the image's box before the bytes
+ * arrive, so a lazily loaded image drops into space the card already gave it and
+ * the fields below it do not move. `cover` keeps a portrait or panoramic source
+ * from changing that box.
+ */
+.team-card__image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--surface-sunken);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-surface);
+}
+
+/*
+ * Requirement 10.8: the `error`-event placeholder. It is the same box at the same
+ * ratio, so nothing reflows when it replaces the image, and it carries the team's
+ * first character centered in it — an empty bordered box at full image height
+ * reads as a rendering failure, and a letter reads as a team without a picture.
+ *
+ * The character is decoration: the element carries `role="img"` and the record's
+ * alt text, the letter is hidden from assistive technology in the markup, and
+ * every other field of the card is styled by the rules below regardless.
+ */
+.team-card__image--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--surface-sunken);
+}
+
+.team-card__initial {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1;
+  /* Muted rather than faint: it is the largest thing on the card and reads as
+     ink, not as a disabled value. */
+  color: var(--ink-muted);
+}
+
+/*
+ * The name is the card's heading, and headings carry no rule beneath them: only
+ * the size is a card decision, since `--text-xl` is the page's heading and this is
+ * an entry's.
+ */
+.team-card__name {
+  /* 1rem at 600: the card's heading is the same size as its body text and is a
+     heading by weight, which is what keeps twenty-four of them from reading as
+     twenty-four page titles. `--text-md` was an entry title sized like one. */
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: var(--leading-tight);
+}
+
+/*
+ * Requirements 11.11, 15.4. The state as text, in full-contrast ink: this
+ * paragraph is what conveys the Conflict_State, and it is also what the rail
+ * reads its color from, so the color is never the only carrier.
+ *
+ * It is the one card field with no small-caps label above it. The state text is
+ * already a sentence naming its own field — "Conflicts with your loaded
+ * calendar" — so a label would restate it, and the rail beside it is the visual
+ * marker that a labeled row would otherwise be.
+ *
+ * At card density it is a compact badge sitting at the card's left edge beside the
+ * rail, bounded in the state's own hue with the text itself in `--ink`: a full
+ * sentence set at full width was a paragraph of chrome above the goals text, and
+ * putting the hue on the boundary rather than on the letters keeps the text at the
+ * 4.5:1 Requirement 11.3 asks of it while the badge is still readable at a glance.
+ */
+.team-card__conflict {
+  align-self: start;
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid var(--badge-hue, var(--border-strong));
+  border-radius: var(--radius-control);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.team-card__conflict[data-conflict='clear'] {
+  --badge-hue: var(--state-clear);
+}
+
+.team-card__conflict[data-conflict='unknown'] {
+  --badge-hue: var(--state-unknown);
+}
+
+.team-card__conflict[data-conflict='conflicting'] {
+  --badge-hue: var(--state-conflict);
+}
+
+/*
+ * Requirement 4.2's excerpt: the card's one run of body text, at body size, bounded
+ * to three lines.
+ *
+ * The clamp is a second bound over a string the component has already cut on a
+ * word boundary, not the truncation itself — with no stylesheet the card still
+ * shows at most 200 characters — so nothing here is load-bearing and the `overflow`
+ * hides no text that the record's excerpt does not already end. `line-clamp` is
+ * stated alongside the prefixed property for the browsers that have taken it
+ * unprefixed; where neither applies, the excerpt is simply as tall as it is.
+ */
+.team-card__goals {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+}
+
+/*
+ * The distinct Colleges. Nothing is set here: the markup carries `chip-list` and
+ * `chip` from `primitives.css`, which is the card-density form of a multi-value
+ * field — one wrapping row of bounded values instead of a labeled stack costing a
+ * line per College. The bound on each chip is what keeps two Colleges from being
+ * read as one name, which is the job the one-per-line list was doing, and the
+ * Team_Detail_View still sets the same field as a labeled field row.
+ *
+ * The class stays on the element as the test hook and as the name of the field.
+ */
+
+/*
+ * The meeting row is a labeled field row read inline: the `Meets` label carries
+ * `field-row__label` in the markup, so it is the same small-caps label in
+ * `--ink-muted` that labels a field in the detail view, and the day and time text
+ * follows it in `--ink`.
+ */
+.team-card__meeting {
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------- the listing */
+
+/*
+ * Control labels. The same treatment as `.field-row__label` in `primitives.css` —
+ * small-caps and letterspaced in `--ink-muted` — so a control's label and a
+ * record's field label read as one system. It is restated rather than shared
+ * because these are `label` and `legend` elements naming controls, not field
+ * rows, and because `controls.css` owns their hit area.
+ */
+.listing__page-label,
+.listing__size-label,
+.sort-control__label,
+.filter-panel__legend,
+.selected-values__filter {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  line-height: var(--leading-tight);
+  color: var(--ink-muted);
+}
+
+/*
+ * The sort control: a label over its control, capped short of the full column so
+ * it does not run the width of a wide display. The search field is the masthead's
+ * now, and is shaped there.
+ */
+.sort-control {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+  max-width: 26rem;
+}
+
+.sort-control__select {
+  width: 100%;
+}
+
+/*
+ * The results toolbar: the tally, the sort control, the page-size control, the
+ * hide-conflicts toggle, and the selected-value indicators with clear-all, on one
+ * wrapping row directly above the card grid.
+ *
+ * The hairline is beneath it rather than above the count, because the toolbar is
+ * now the whole of the boundary between the controls and the catalog — a boundary
+ * between two regions of the page rather than a divider inside a bordered surface,
+ * so it takes `--border-strong`. Items wrap onto their own lines rather than
+ * compressing, and they align on their bottom edges so each control lines up with
+ * its neighbour's control rather than with its label. Each control is styled where
+ * it is defined; this owns the row only.
+ */
+.listing__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3) var(--space-6);
+  padding-block-end: var(--space-3);
+  border-block-end: var(--border-width) solid var(--border-strong);
+}
+
+/*
+ * The tally: the count over the page position, both in the tabular numeric column
+ * so the two numbers line up under one another and neither shifts as a digit is
+ * added. It leads the row and holds its width, since it is the answer to the query
+ * and the controls beside it are the means.
+ */
+.listing__tally {
+  flex: 1 1 12rem;
+}
+
+/*
+ * Requirements 4.1, 11.4. The count is the ARIA live region, and it stays
+ * ordinary visible text in the normal flow: nothing here hides it, moves it out
+ * of flow, or collapses it when the count is zero, so what is announced is also
+ * what is read.
+ */
+.listing__count {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  font-size: var(--text-md);
+  color: var(--ink);
+}
+
+/*
+ * The page position belongs with the count, so it takes a tight gap instead of
+ * the shell's default. `margin-block-start` only: the sidebar layout insets the
+ * listing's blocks with `margin-inline-start`, and the shorthand would drop it.
+ */
+.listing__position {
+  margin-block-start: var(--space-1);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+/* The page-size control: a label over its control, like the sort control beside
+   it, sized to its longest option rather than to the row. */
+.listing__page-size {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+/*
+ * The toggle and the indicator strip each take a full row of the toolbar: the
+ * toggle's excluded count and its no-calendar notice are sentences, and the
+ * indicators are as many chips as there are selected values, so neither belongs in
+ * a column beside a `select`.
+ */
+.listing__toolbar .hide-conflicts,
+.listing__toolbar .selected-values {
+  flex: 1 1 100%;
+}
+
+/*
+ * Requirement 4.5. The pager at the foot of the catalog, wrapping at narrow widths
+ * rather than scrolling: the two steps with the page number between them, in the
+ * order the markup gives them. The page size has moved up to the toolbar, where it
+ * sits with the count it changes.
+ */
+.listing__pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding-block-start: var(--space-4);
+  border-block-start: var(--border-width) solid var(--border-strong);
+}
+
+/* Page numbers are numbers: tabular figures, so the select reads as the counter
+   it is. */
+.listing__page-select {
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * The catalog's action buttons: the page steps, the clear-all control, and the
+ * empty state's clear-all. Small caps, matching the labels around them; the
+ * border, the padding, and the target floor are `controls.css`, and the disabled
+ * step at either end of the range takes its faint ink there too.
+ */
+.listing__page-step,
+.selected-values__clear,
+.empty-state__clear {
+  font-size: var(--text-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+}
+
+/* --------------------------------------------------------- the Filter_Panel */
+
+/* The `fieldset` is a grouping element here, not a box: the legend's hairline is
+   the group's only boundary, which keeps four groups from reading as four cards. */
+.filter-panel__group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.filter-panel__legend {
+  display: block;
+  width: 100%;
+  padding: 0;
+  /* The group's only boundary, per the comment above, so it is the boundary
+     token rather than the divider one. */
+  border-block-end: var(--border-width) solid var(--border-strong);
+}
+
+/*
+ * Requirements 19.1, 19.2, 11.13. The disclosure control fills its legend so the
+ * whole group heading is the target: the Filter's name at the near edge and its
+ * selected count at the far one, the same two-column reading as a value row. It
+ * takes none of the control chrome from `controls.css` — a heading that happens to
+ * be activatable should not read as a button sitting on the group — so the border
+ * and the fill are cleared and the legend's hairline stays the only edge. The
+ * focus ring is untouched, which is what keeps it identifiable by keyboard.
+ *
+ * The triangle is a `::before` on the control rather than a character in the
+ * markup, so the accessible name is the Filter and its count and nothing else.
+ */
+.filter-panel__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  cursor: pointer;
+  /* Inherited from `.filter-panel__legend` above; restated because a `button`
+     does not inherit the legend's type in every engine. */
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  line-height: var(--leading-tight);
+  color: var(--ink-muted);
+}
+
+.filter-panel__toggle::before {
+  content: '';
+  flex: none;
+  width: 0.5em;
+  height: 0.5em;
+  margin-inline-end: var(--space-2);
+  border-right: 2px solid currentcolor;
+  border-bottom: 2px solid currentcolor;
+  /* Pointing right while collapsed, down while expanded. */
+  transform: rotate(-45deg);
+}
+
+.filter-panel__toggle[aria-expanded='true']::before {
+  transform: rotate(45deg);
+}
+
+.filter-panel__filter-name {
+  min-width: 0;
+}
+
+/* The selected count sits in the same tabular column the value counts do, so a
+   collapsed group and an open one line up. */
+.filter-panel__selected-count {
+  flex: none;
+  font-weight: 400;
+  letter-spacing: normal;
+  color: var(--ink-faint);
+}
+
+.filter-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-block-start: var(--space-2);
+}
+
+/* A collapsed group with nothing selected has an empty body; the gap above would
+   otherwise still be spent on it. */
+.filter-panel__body:empty {
+  margin-block-start: 0;
+}
+
+/*
+ * Requirement 19.4. The Value_Filter is a label over its field, like every other
+ * control on the page; its label is sentence case in muted ink rather than the
+ * group's small caps, so it reads as a control inside the group rather than as a
+ * second heading for it.
+ */
+.filter-panel__value-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: stretch;
+}
+
+.filter-panel__value-filter-label {
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
+  color: var(--ink-muted);
+}
+
+.filter-panel__value-filter-input {
+  width: 100%;
+  font-size: var(--text-sm);
+}
+
+/* Requirement 19.5: the no-match message, stated quietly in the group where the
+   Value_Filter that produced it lives. */
+.filter-panel__no-match {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--ink-muted);
+}
+
+/* Requirement 19.3: the reveal control, sized as the quiet action it is and set
+   at the near edge under the values it extends. */
+.filter-panel__reveal {
+  align-self: flex-start;
+  font-size: var(--text-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+}
+
+.filter-panel__values {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * One dense row per value: the checkbox at its native size, then the label, which
+ * spans the rest of the row so the count can sit at its far edge.
+ */
+.filter-panel__value {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filter-panel__checkbox {
+  flex: none;
+  margin: 0;
+}
+
+.filter-panel__label {
+  flex: 1 1 auto;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+/* The value is what wraps when the row is too narrow; the count never is. */
+.filter-panel__value-text {
+  min-width: 0;
+}
+
+/*
+ * Requirement 6.5's count, in the tabular numeric column: the `numeric` device
+ * in the markup supplies the tabular figures and the right alignment, and the
+ * label's `space-between` puts the count at the row's far edge, so the counts
+ * down one Filter's checklist line up into a column.
+ *
+ * No color of its own: the count inherits the label's ink, which is what keeps a
+ * zero-count row entirely in `--ink-faint`.
+ */
+.filter-panel__count {
+  flex: none;
+}
+
+/*
+ * Requirement 6.11. A zero count is `disabled`, and the not-selectable rendering
+ * is the faint ink the field rows use for a value that cannot be had. The row
+ * keeps its place in the checklist rather than disappearing, so the count is
+ * still readable as zero.
+ */
+.filter-panel__checkbox:disabled + .filter-panel__label {
+  color: var(--ink-faint);
+}
+
+/*
+ * Requirement 6.6: the Major values on offer are a consequence of the selected
+ * Colleges, so the Major group is set as a subordinate of the College group — one
+ * step in, behind a hairline, the way a nested entry is indented in a catalog. At
+ * every width the two groups are adjacent in the markup, so the indent reads
+ * against the College group whether they stack or sit side by side.
+ *
+ * The panel around it carries no border of its own, so this edge is the only
+ * thing marking the subordination and it takes the boundary token.
+ */
+.filter-panel__group[data-filter='major'] {
+  margin-inline-start: var(--space-3);
+  padding-inline-start: var(--space-3);
+  border-inline-start: var(--border-width) solid var(--border-strong);
+}
+
+/* -------------------------------------------------------- the filter drawer */
+
+/*
+ * Requirement 19.8's opening control, below the sidebar breakpoint only — the
+ * geometry of the sheet it opens is `layout.css`, and this is its surface. It
+ * takes the control chrome from `controls.css` and spans the column it sits in,
+ * because it stands in for the whole Filter_Panel and a hairline button the width
+ * of its own text does not read that way. The selected count is part of its text,
+ * so nothing here may hide any of it.
+ */
+.filter-drawer__open {
+  width: 100%;
+  font-size: var(--text-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+  text-align: start;
+}
+
+/*
+ * The open sheet is the page field, not a card: it covers the listing entirely,
+ * so a `--surface` fill would read as a panel floating on a page that is no
+ * longer visible. Opaque regardless — the content behind it must not show
+ * through.
+ */
+.filter-drawer__sheet {
+  background: var(--bg);
+}
+
+/* --------------------------------------------------- the selected indicators */
+
+/*
+ * Requirements 6.8, 6.9, 16.7. The strip of indicators and the clear-all control
+ * on one wrapping row.
+ */
+.selected-values {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.selected-values__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/*
+ * One indicator: the Filter name, the value as the Dataset spells it, and the
+ * control that removes that value. The flat bordered surface again, stated here
+ * because an indicator is not itself interactive — the button inside it is.
+ */
+.selected-values__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-inline: var(--space-2) var(--space-1);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-control);
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
+}
+
+.selected-values__value {
+  color: var(--ink);
+}
+
+/* The removal control: the `×` centered in its own target, with the boundary and
+   the 24px floor from `controls.css` intact. Its accessible name names both the
+   Filter and the value, so the glyph carries none of the meaning. */
+.selected-values__remove {
+  justify-content: center;
+  padding-inline: var(--space-1);
+  line-height: 1;
+}
+
+/* ----------------------------------------------------------- the empty state */
+
+/*
+ * Requirements 5.7, 16.8, 16.9. Both messages share one block: the flat bordered
+ * surface, its message, and the clear-all control that recovers the view.
+ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-surface);
+}
+
+/*
+ * The all-conflict case takes the conflict hue on its left edge — the same rail
+ * width and the same decoration-only role it has on a Team_Card, next to a
+ * message that already says the toggle is what emptied the Result_Set.
+ */
+.empty-state[data-empty-reason='allConflict'] {
+  border-inline-start: var(--rail-width) solid var(--state-conflict);
+}
+
+.empty-state__message {
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+}
+
+/* Requirement 16.3's excluded count, in tabular figures like every other count on
+   the page. */
+.empty-state__excluded {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}

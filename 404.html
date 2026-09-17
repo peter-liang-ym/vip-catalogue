@@ -12,6 +12,27 @@
     -->
     <base href="/" />
     <title>VIP Teams Mirror (unofficial)</title>
+    <!--
+      Requirement 18.8 applies to any page of the Mirror_Site, and this is the page
+      every /team/{id} deep link actually loads, so the pre-paint theme resolution
+      from index.html is repeated here verbatim. See index.html for why it exists
+      and why it is guarded.
+    -->
+    <script>
+      try {
+        var stored = JSON.parse(localStorage.getItem('vipmirror.theme'));
+        if (
+          stored !== null &&
+          typeof stored === 'object' &&
+          stored.storageVersion === '1' &&
+          (stored.theme === 'light' ||
+            stored.theme === 'dark' ||
+            stored.theme === 'system')
+        ) {
+          document.documentElement.dataset.theme = stored.theme;
+        }
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="app"></div>

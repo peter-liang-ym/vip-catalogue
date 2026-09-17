@@ -1,0 +1,3 @@
+{
+  "rewrites": [{ "source": "/team/:entryId", "destination": "/index.html" }]
+}

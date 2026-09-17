@@ -108,17 +108,17 @@ describe('parseTeamPage over entry-1248.html', () => {
       {
         name: 'Brent Wagner',
         affiliation: 'Georgia Tech Research Institute',
-        email: 'brent.wagner@gtri.gatech.edu',
+        email: '',
       },
       {
         name: 'Eric Vogel',
         affiliation: 'Georgia Tech Research Institute',
-        email: 'eric.vogel@mse.gatech.edu',
+        email: '',
       },
       {
         name: 'Hunter Chan',
         affiliation: 'Georgia Tech Research Institute',
-        email: 'hunter_chan@defaultemail.com',
+        email: '',
       },
     ]);
   });
@@ -198,7 +198,7 @@ describe('parseTeamPage over entry-14350.html', () => {
       {
         name: 'Abigale Stangl',
         affiliation: 'Industrial Design',
-        email: 'astangl3@gatech.edu',
+        email: '',
       },
     ]);
   });
@@ -265,7 +265,7 @@ describe('parseTeamPage over entry-drifted.html', () => {
       {
         name: 'Dr. Ada Placeholder',
         affiliation: 'School of Electrical and Computer Engineering',
-        email: 'ada.placeholder@example.gatech.edu',
+        email: '',
       },
       {
         name: 'Dr. Ben Sample',
@@ -275,7 +275,7 @@ describe('parseTeamPage over entry-drifted.html', () => {
       {
         name: 'Dr. Cleo Stand-In',
         affiliation: 'School of Physics',
-        email: 'cleo.standin@example.gatech.edu',
+        email: '',
       },
     ]);
   });
@@ -346,8 +346,8 @@ describe('grid-shaped section bodies', () => {
     const { record } = parseTeamPage(html, entryUrl('2'));
 
     expect(record?.advisors).toEqual([
-      { name: 'One Advisor', affiliation: 'Aff One', email: 'one@gatech.edu' },
-      { name: 'Two Advisor', affiliation: 'Aff Two', email: 'two@gatech.edu' },
+      { name: 'One Advisor', affiliation: 'Aff One', email: '' },
+      { name: 'Two Advisor', affiliation: 'Aff Two', email: '' },
     ]);
   });
 
@@ -395,7 +395,7 @@ describe('grid-shaped section bodies', () => {
       { college: 'Computing', major: 'Computer Science' },
     ]);
     expect(record?.advisors).toEqual([
-      { name: 'Solo', affiliation: 'Aff', email: 'solo@gatech.edu' },
+      { name: 'Solo', affiliation: 'Aff', email: '' },
     ]);
   });
 });

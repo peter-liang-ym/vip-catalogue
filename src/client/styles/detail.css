@@ -1,0 +1,322 @@
+/*
+ * The record surfaces: `TeamDetail`, the shell's listing link beside it, and
+ * `NotFound`.
+ *
+ * A per-view stylesheet, so it consumes tokens and composes the devices and
+ * defines neither. The gutter, the bottom padding, the capped measure on
+ * `.team-detail__text`, and the break-anywhere rules for the name, the Majors, and
+ * an advisor's email are all `layout.css`; the focus ring, the 24px target floor,
+ * and the control boundaries are `controls.css`. Nothing here restates or cancels
+ * any of them.
+ *
+ * The detail view is the same catalog entry as a Team_Card, read at length. The
+ * Meeting_Info labels are the labeled field row's small caps, the same treatment
+ * that labels `Meets` and `Colleges` on a card; the Majors are indented behind a
+ * hairline exactly as the Major Filter is indented behind the College Filter; and
+ * the Conflict_State takes the same 4px state rail the card does. So a field
+ * learned in the listing is recognized here, and what changes is density: air is
+ * spent between the sections rather than inside them.
+ *
+ * `NotFound` renders no Team_Record field, so it has no field styling to share, and
+ * the navigation and footer Requirement 9.5 asks for are the site chrome, which
+ * wraps every route and is styled once in `base.css`. Nothing in this file touches
+ * the chrome.
+ */
+
+/* --------------------------------------------------- the Team_Detail_View */
+
+/*
+ * One column of sections with air between them. `padding-inline`,
+ * `padding-block-end`, and the measure come from `layout.css`; the `gap` is this
+ * surface's own rhythm, and it is the whole of the spacing between the name, the
+ * image, the Conflict_State, the Conflict_Detail, the field sections, and the two
+ * fixed links.
+ */
+.team-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+/*
+ * Requirement 9.1's fields. Tight inside a section — the heading and its value are
+ * one group — with the section gap above doing the separating.
+ */
+.team-detail__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/*
+ * A field heading is a heading, so it keeps the hairline from `base.css`; only the
+ * size is a detail-view decision, since `--text-xl` is the page's heading and the
+ * record's name already holds `h1`.
+ */
+.team-detail__heading {
+  font-size: var(--text-lg);
+}
+
+/*
+ * The image, at the same reserved box the Team_Card gives it: `aspect-ratio` with
+ * `width: 100%` means the fields below it do not move when the bytes arrive, and
+ * `cover` keeps a portrait or panoramic source from changing that box. Capped
+ * short of the full column so a wide display does not turn one photograph into the
+ * page.
+ */
+.team-detail__image {
+  display: block;
+  width: 100%;
+  max-width: 44rem;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--surface-sunken);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-surface);
+}
+
+/*
+ * Requirement 10.8: the `error`-event placeholder, the same box at the same ratio
+ * filled with the faint diagonal hatch the card's placeholder uses, so it reads as
+ * a missing image rather than an empty one. The hatch is decoration — the element
+ * carries `role="img"` and the record's alt text — and every other field of the
+ * record renders regardless.
+ */
+.team-detail__image--placeholder {
+  background-color: var(--surface-sunken);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--border) 0 1px,
+    transparent 1px 8px
+  );
+}
+
+/*
+ * Requirements 11.11, 15.4. The state as text in full-contrast ink, with the state
+ * rail beside it: same 4px edge, same three hues, and the same decoration-only role
+ * it has on a Team_Card. The paragraph renders only while a Busy_Schedule is loaded
+ * and always carries one of the three states, so there is no unloaded case to
+ * color for; `--border` is the initial value only so an unrecognized value could
+ * not leave the edge unpainted.
+ *
+ * The rail is restated here rather than taken from `.rail` because that device also
+ * carries the hover affordance, and this paragraph does not respond to a pointer —
+ * the same reason the freshness notices and the empty state state their own
+ * boundaries.
+ */
+.team-detail__conflict {
+  --state-hue: var(--border);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-inline-start: var(--rail-width) solid var(--state-hue);
+  border-radius: var(--radius-surface);
+  color: var(--ink);
+}
+
+.team-detail__conflict[data-conflict='clear'] {
+  --state-hue: var(--state-clear);
+}
+
+.team-detail__conflict[data-conflict='unknown'] {
+  --state-hue: var(--state-unknown);
+}
+
+.team-detail__conflict[data-conflict='conflicting'] {
+  --state-hue: var(--state-conflict);
+}
+
+/* The record's own prose, at body size and normal leading; `layout.css` caps the
+   line length. */
+.team-detail__text {
+  line-height: var(--leading-normal);
+}
+
+/* ------------------------------------------------ Majors grouped by College */
+
+/* The Colleges are the groups, so the air is between them and the marker goes. */
+.team-detail__colleges {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/*
+ * A College heading names the same datum a Team_Card lists under its `Colleges`
+ * label, so it stays full-contrast ink rather than becoming a muted label. The
+ * hairline `base.css` puts under a heading is dropped here: it is
+ * the innermost heading on the page, and one rule per College would read as a
+ * stack of boxes rather than as one field.
+ */
+.team-detail__college-name {
+  padding-bottom: 0;
+  border-bottom: 0;
+  font-size: var(--text-base);
+}
+
+/*
+ * Requirement 9.1's grouping, drawn the way the Filter_Panel draws it: the Majors
+ * are a consequence of the College above them, so they sit one step in behind a
+ * hairline, exactly as the Major Filter group is indented behind the College
+ * Filter group. One Major per line, so two cannot be misread as one name.
+ *
+ * Nothing borders the section around it, so this edge is the only thing marking
+ * the subordination and it takes the boundary token, as the Filter group does.
+ */
+.team-detail__majors {
+  margin-block-start: var(--space-2);
+  margin-inline-start: var(--space-3);
+  padding: 0 0 0 var(--space-3);
+  border-inline-start: var(--border-width) solid var(--border-strong);
+  list-style: none;
+}
+
+.team-detail__majors > li + li {
+  margin-top: var(--space-1);
+}
+
+/* -------------------------------------------------------------- Advisors */
+
+/*
+ * Requirement 9.2: one bordered block per Advisor. The flat bordered surface again,
+ * stated here rather than taken from `.surface` because an Advisor block is not
+ * interactive — the mail link inside it is. The blocks fit side by side once there
+ * is room and stack when there is not, with no breakpoint saying so.
+ */
+.team-detail__advisors {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(17rem, 100%), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.team-detail__advisor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-surface);
+  line-height: var(--leading-tight);
+}
+
+.team-detail__advisor-name {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/*
+ * Requirement 9.7: an Advisor shows a name and, where the Source_Site states one,
+ * an affiliation, so the block is sized by whichever of the two parts exist rather
+ * than reserving a row for one that is not there.
+ */
+.team-detail__advisor-affiliation {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+/*
+ * One pointer for the whole section, not one per Advisor: addresses are not
+ * published, and the Source_Site page carries all of them together.
+ */
+.team-detail__advisor-contact {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+/* --------------------------------------------------------- Meeting_Info */
+
+/*
+ * The three Meeting_Info values as labeled field rows read across one line: the
+ * `dt` is the label and the `dd` is the value, in the same small caps over
+ * full-contrast ink that `primitives.css` sets for a field row. It is restated
+ * rather than shared because these are `dl` parts, not elements carrying the
+ * device's classes, and because Requirement 9.6 lets any of the three be absent —
+ * the row is sized by the parts that render.
+ */
+.team-detail__meeting {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+}
+
+.team-detail__meeting-part {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.team-detail__meeting-part > dt {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  line-height: var(--leading-tight);
+  color: var(--ink-muted);
+}
+
+/* `base.css` has already dropped the `dd` indent along with every other element's
+   default margin, so the value only needs its ink and its leading. */
+.team-detail__meeting-part > dd {
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------- the fixed links */
+
+/*
+ * Requirement 9.3: the Source_Site page for this team and the official VIP
+ * application page. Both leave the mirror, so they are set apart from the record
+ * content rather than mixed into it — their own bordered block, above the gutter's
+ * bottom padding, with one link per line so neither is mistaken for the other's
+ * continuation.
+ */
+.team-detail__links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-surface);
+}
+
+/*
+ * Requirement 9.4's listing link is the shell's, not the record's: it sits outside
+ * `.team-detail` in the markup, so it carries its own top rule to close the page
+ * the way the listing's count opens it — a page-level boundary, so the boundary
+ * token, exactly as the listing's count takes it. `layout.css` gives it the gutter.
+ */
+.team-detail__listing {
+  padding-block: var(--space-4) var(--space-10);
+  border-block-start: var(--border-width) solid var(--border-strong);
+}
+
+/* --------------------------------------------------------- the not-found page */
+
+/*
+ * Requirement 9.5. The message and the listing link, and nothing else: there is no
+ * Team_Record here to render a field from. The site navigation and footer come from
+ * the chrome, which is untouched by this file.
+ */
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+/* The message is the page's heading, one step down from a team name: this page
+   states a fact, it does not announce a title. */
+.not-found__message {
+  font-size: var(--text-xl);
+}

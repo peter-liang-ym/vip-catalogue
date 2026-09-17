@@ -20,7 +20,9 @@
  * None of the three cases replaces anything: this component renders above the
  * listing and the listing renders the Result_Set either way, so "SHALL continue to
  * display the Result_Set" in Requirements 10.4 and 10.6 holds by composition
- * rather than by a condition.
+ * rather than by a condition. The two qualifying cases carry `notice`, the one
+ * shared advisory style in `base.css`, which is in the normal flow and sized by its
+ * own text, so neither displaces anything either.
  *
  * `generatedAt` is typed as possibly absent even though `Dataset` declares it
  * required, because Requirement 10.6 is exactly the case where the published
@@ -112,7 +114,7 @@ export function Freshness({ generatedAt, now }: FreshnessProps) {
   return (
     <div class="freshness" data-testid="freshness">
       {currency.kind === 'unknown' ? (
-        <p class="freshness__unknown" data-testid="freshness-unknown">
+        <p class="freshness__unknown notice" data-testid="freshness-unknown">
           {UNKNOWN_CURRENCY_TEXT} <SourceSiteLink />
         </p>
       ) : (
@@ -124,7 +126,7 @@ export function Freshness({ generatedAt, now }: FreshnessProps) {
       )}
 
       {currency.kind === 'stale' && (
-        <p class="freshness__stale" data-testid="freshness-stale">
+        <p class="freshness__stale notice" data-testid="freshness-stale">
           {STALE_NOTICE_TEXT} <SourceSiteLink />
         </p>
       )}

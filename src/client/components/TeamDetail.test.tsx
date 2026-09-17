@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { TeamRecord } from '../../shared/types';
 import { CONFLICT_TEXT } from './TeamCard';
 import {
+  ADVISOR_CONTACT_TEXT,
   APPLICATION_LINK_TEXT,
   APPLICATION_URL,
   groupMajorsByCollege,
@@ -182,16 +183,16 @@ describe('TeamDetail', () => {
     expect(meeting?.textContent).toBe(`${HEADINGS.meeting}DayThursday`);
   });
 
-  it('renders every advisor with a mail link where an email exists (Requirements 9.2, 9.7)', () => {
+  it('renders every advisor with a name and an affiliation where one exists (Requirements 9.2, 9.7)', () => {
     mount({
       team: record({
         advisors: [
           {
             name: 'Gil Weinberg',
             affiliation: 'School of Music',
-            email: 'gil@gatech.edu',
+            email: '',
           },
-          { name: 'No Link Person', affiliation: 'GTRI', email: '' },
+          { name: 'No Affiliation Person', affiliation: '', email: '' },
         ],
       }),
     });
@@ -201,15 +202,32 @@ describe('TeamDetail', () => {
     ];
     expect(advisors).toHaveLength(2);
 
-    expect(advisors[0]?.textContent).toBe(
-      'Gil WeinbergSchool of Musicgil@gatech.edu',
-    );
-    expect(advisors[0]?.querySelector('a')?.getAttribute('href')).toBe(
-      'mailto:gil@gatech.edu',
-    );
+    expect(advisors[0]?.textContent).toBe('Gil WeinbergSchool of Music');
+    expect(advisors[1]?.textContent).toBe('No Affiliation Person');
+  });
 
-    expect(advisors[1]?.textContent).toBe('No Link PersonGTRI');
-    expect(advisors[1]?.querySelector('a')).toBeNull();
+  it('shows no mail link and points at the source page for contact details', () => {
+    // Advisor addresses are not published, so no Team_Detail_View can offer a
+    // mail link even for a record that somehow carries an address.
+    mount({
+      team: record({
+        advisors: [
+          {
+            name: 'Gil Weinberg',
+            affiliation: 'School of Music',
+            email: 'gil@gatech.edu',
+          },
+        ],
+      }),
+    });
+
+    const advisorSection = field('advisors');
+    expect(advisorSection?.textContent).not.toContain('gil@gatech.edu');
+    expect(advisorSection?.querySelector('a[href^="mailto:"]')).toBeNull();
+
+    expect(screen.getByText(ADVISOR_CONTACT_TEXT).getAttribute('href')).toBe(
+      'https://vip.gatech.edu/teams/entry/1248',
+    );
   });
 
   it('links to the source page and the application page (Requirement 9.3)', () => {

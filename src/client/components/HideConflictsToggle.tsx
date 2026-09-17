@@ -111,7 +111,7 @@ export function HideConflictsToggle({
         // Announced: it appears in response to turning the toggle on and is the
         // reason the listing did not change.
         <p
-          class="hide-conflicts__notice"
+          class="hide-conflicts__notice notice"
           role="status"
           data-testid="hide-conflicts-no-calendar"
         >

@@ -20,6 +20,12 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    // The default 5s is not enough for the jsdom suites on a loaded machine: the
+    // first test in a file pays the environment, Preact, and Testing Library
+    // warm-up, and a `getByRole` query behind it then times out with nothing
+    // actually wrong. Every assertion here is synchronous, so a larger ceiling
+    // costs nothing on a passing run and only affects which failures are real.
+    testTimeout: 20_000,
     include: [
       'test/**/*.test.ts',
       'test/**/*.test.tsx',

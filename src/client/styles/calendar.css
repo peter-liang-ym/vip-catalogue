@@ -1,0 +1,391 @@
+/*
+ * The calendar surfaces: `CalendarControl`, `CalendarStatus`,
+ * `HideConflictsToggle`, and `ConflictDetailView`.
+ *
+ * A per-view stylesheet, so it consumes tokens and composes the devices and defines
+ * neither. The focus ring on the file input, the disclosure and removal controls,
+ * the toggle, and the `tabindex` busy affordance is `controls.css`, once for all of
+ * them, as are their 24px target floors and their boundaries; the filter rail the
+ * disclosure sits in and the row the toggle sits on are `layout.css` and
+ * `listing.css`, as is the break-anywhere rule for a long calendar file name.
+ * Nothing here restates or cancels any of them.
+ *
+ * The file control and the summary are two states of one surface, not two blocks:
+ * the disclosure is one control until it is asked for, and one line of summary once
+ * a Busy_Schedule is loaded, so neither costs the rail vertical space it is not
+ * using.
+ *
+ * Two things hold this group together. The drop target is one bounded area, so the
+ * boundary is what says where a file may be dropped and a solid ink edge is what
+ * says a drag is over it. And every message the calendar can produce — a rejected
+ * file, an unreadable file, a file with nothing weekly in it, a parse that ran out
+ * of budget, a reader that would not download, a schedule that could not be
+ * restored or could not be saved, and a toggle with no calendar to act on — takes
+ * the site's one shared notice style — the same `.notice` the freshness notices and
+ * the Dataset load messages take — so a visitor learns to read an advisory message
+ * once and reads every later one for free.
+ *
+ * Color carries nothing here. The Conflict_Detail's rail is decoration over text
+ * that already names the conflict (Requirement 11.11), and every notice is a
+ * sentence.
+ */
+
+/* ------------------------------------------------ the calendar disclosure */
+
+/*
+ * The disclosure in the filter rail (Requirement 14.1): its control, the summary of
+ * what is loaded, and the body holding the Calendar_File control. Collapsed with
+ * nothing loaded it is one control tall, which is the whole point of moving it out
+ * of the results column.
+ */
+.calendar-disclosure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+/*
+ * The control that opens the body, and the replace affordance once a Busy_Schedule
+ * is loaded. Set like the catalog's other action buttons; its border, padding, and
+ * target floor are `controls.css`. It spans the rail, so the whole width of the
+ * collapsed disclosure is its hit area rather than a word of it.
+ */
+.calendar-disclosure__toggle {
+  width: 100%;
+  font-size: var(--text-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+  text-align: start;
+}
+
+/* The removal control (Requirement 17.4), on the summary line beside what it
+   removes; the same treatment as the control above it. */
+.calendar-disclosure__remove {
+  font-size: var(--text-sm);
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+}
+
+/* The body the control discloses. `hidden` is what takes it out of the tab order
+   and the accessibility tree while collapsed, and it needs no rule of its own. */
+.calendar-disclosure__body {
+  width: 100%;
+}
+
+/* --------------------------------------------- the Calendar_File control */
+
+/*
+ * Requirement 14.1: one control that takes a file both ways, so the whole block is
+ * the drop target and its boundary is what marks the area a file may be dropped
+ * onto. Dashed rather than solid, in the same boundary token every control boundary
+ * uses, so it reads as a place to put something rather than as a card.
+ *
+ * `align-items: flex-start` keeps the file input, the removal control, and the
+ * messages at their own widths inside the column instead of stretching them.
+ */
+.calendar-control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--border-width) dashed var(--border-strong);
+  border-radius: var(--radius-surface);
+  transition: border-color var(--transition-duration) linear;
+}
+
+/*
+ * A drag is over the target: the boundary goes solid ink and the block takes a
+ * faint accent wash. Both are paint changes on a border that is already at its
+ * final width, so the target does not move, resize, or reflow under the pointer,
+ * and nothing below it shifts. It is decoration on top of the hint text, which states
+ * that a file can be dragged here whether or not one is being dragged.
+ */
+.calendar-control[data-drop-active] {
+  background: var(--accent-subtle);
+  border-style: solid;
+  border-color: var(--ink);
+}
+
+/*
+ * Requirement 11.10: the two visible labels naming these controls — the
+ * Calendar_File input and the hide-conflicts checkbox — in one rule, the way the
+ * listing states its own control labels in one rule.
+ *
+ * The treatment is `.field-row__label`'s from `primitives.css`: small-caps and
+ * letterspaced in `--ink-muted`, so a control's label and a record's field label
+ * read as one system. It is restated rather than shared because these are `label`
+ * elements naming controls, not field rows, and because `controls.css` owns their
+ * hit area.
+ */
+.calendar-control__label,
+.hide-conflicts__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  line-height: var(--leading-tight);
+  color: var(--ink-muted);
+}
+
+/* Requirement 14.1's other half, stated as text beside the target it describes. */
+.calendar-control__hint {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--ink-muted);
+}
+
+/*
+ * The busy affordance while the reader downloads and the parse runs. It carries
+ * `notice` in the markup, so its surface, its boundary, its ink, and its measure
+ * are the shared notice style from `base.css` and nothing is restated here.
+ *
+ * It also carries `tabindex="0"`, so it is reachable by keyboard and takes the
+ * focus ring from `controls.css`; the minimum height is the only thing this rule
+ * adds — the same 24px floor the controls get, since a focusable thing should not
+ * be smaller than the ring around it.
+ *
+ * It is motion-free: no spinner, no pulse, nothing to disable under
+ * `prefers-reduced-motion`. The text is the whole indication, which is also what
+ * makes the state legible to a visitor who cannot see it.
+ */
+.calendar-control__busy {
+  min-height: var(--space-6);
+}
+
+/*
+ * Requirement 17.9: read on this device, not uploaded, removable at any time. A
+ * hairline above it sets it under the control as the control's own footnote, which
+ * is where the requirement puts it, rather than as one more notice in the stack.
+ */
+.calendar-control__privacy {
+  width: 100%;
+  padding-block-start: var(--space-2);
+  /* A divider inside the already-bordered drop target, which is the one place a
+     sub-3:1 hairline is permitted. */
+  border-block-start: var(--border-width) solid var(--border);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--ink-muted);
+}
+
+/* --------------------------------------------------------- calendar notices */
+
+/*
+ * One style for every calendar message: the two pre-parse rejections
+ * (Requirements 14.3, 14.4), the retained-count message (14.14), the unreadable
+ * file (14.15), the file with no weekly events (14.16), the parse that ran out of
+ * budget (14.17), the reader that would not download, the schedule that could not
+ * be restored (17.7), the schedule that could not be saved (17.8), and the toggle
+ * with no calendar to act on (16.4).
+ *
+ * They differ in what they say and in whether they are announced as `status` or as
+ * `alert`; they do not differ in how they look, because every one of them says the
+ * same kind of thing — what happened, and what is still in effect.
+ *
+ * That look is not defined here. Every one of these elements carries `notice` in
+ * the markup, exactly as the freshness notices do, so the flat bordered surface,
+ * the boundary token, the ink, the size, and the 80ch measure all come from the one
+ * `.notice` rule in `base.css` — which is the whole point of a shared style, and is
+ * why this file has no notice rule of its own to drift from it.
+ *
+ * Two things that rule deliberately withholds are worth naming, because an earlier
+ * pass at these surfaces had both. No state color: none of these messages is a
+ * Conflict_State, and borrowing one of the three hues would make an unreadable file
+ * look like a scheduling outcome. And no thickened left edge: the rail now means "a
+ * Busy_Schedule is loaded" — it is the Team_Card's and the Conflict_Detail's — so a
+ * notice wearing one would claim a meaning it does not have.
+ */
+
+/* ------------------------------------------------ the loaded-schedule summary */
+
+.calendar-status {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/*
+ * Requirement 14.18: the file name, the count of Busy_Blocks, and the load time
+ * with its zone, on one line with the affordances that act on them. One bordered
+ * block, because they are one answer to "what is loaded" — and it is the block that
+ * stays put when a later file is rejected, which is the visible half of retaining
+ * the schedule already in hand (Requirements 14.15, 14.16, 14.17).
+ *
+ * One line, wrapping rather than clipping: the rail is 240px, and a file name the
+ * visitor chose can be any length, so the row wraps and the summary grows a line
+ * instead of overflowing the rail. `align-items: baseline` sits the removal control
+ * on the same baseline as the text it belongs to.
+ */
+.calendar-status__schedule {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-surface);
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
+}
+
+/* The file name is the visitor's own, and it is the one value here that can be a
+   long unbreakable run; `layout.css` lets it break. */
+.calendar-status__file {
+  color: var(--ink);
+}
+
+/* A count and a timestamp are numbers, so they take tabular figures like every
+   other number on the page. */
+.calendar-status__blocks,
+.calendar-status__loaded {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  color: var(--ink-muted);
+}
+
+/* ------------------------------------------------- the hide-conflicts toggle */
+
+/*
+ * Requirement 16.1: the checkbox and its label on one row, with whichever message
+ * applies on its own line beneath. The checkbox keeps its native size — the label
+ * is the hit area, from `controls.css`.
+ */
+.hide-conflicts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hide-conflicts__checkbox {
+  flex: none;
+  margin: 0;
+}
+
+/* The label itself takes the control-label face above, beside the Calendar_File
+   control's (Requirement 11.10). */
+
+/*
+ * Requirement 16.3's excluded count and Requirement 16.4's no-calendar notice each
+ * take the whole of the next line: they are statements about the setting in force,
+ * not part of the control's own row.
+ */
+.hide-conflicts__excluded,
+.hide-conflicts__notice {
+  flex-basis: 100%;
+}
+
+/* The count itself, in the numeric column like the empty state's excluded count. */
+.hide-conflicts__excluded {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+/* ------------------------------------------------------- the Conflict_Detail */
+
+/*
+ * Requirements 15.4, 15.5, 11.11. The section renders only for a conflicting team,
+ * so it takes the conflict hue on its left edge — the same rail width and the same
+ * decoration-only role it has on a Team_Card, next to a heading that already names
+ * the state in words.
+ */
+.conflict-detail {
+  padding: var(--space-4);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-inline-start: var(--rail-width) solid var(--state-conflict);
+  border-radius: var(--radius-surface);
+}
+
+/*
+ * The heading of a bounded surface, so it takes the size a Team_Card's name takes
+ * inside its own border rather than the `--text-lg` the record's page-level field
+ * headings take. Both are `h2`, and the border around this one is what says it is a
+ * block within the record rather than another field of it. The hairline comes from
+ * `base.css`.
+ */
+.conflict-detail__heading {
+  font-size: var(--text-md);
+}
+
+/*
+ * Up to five blocks (Requirement 15.5), separated by the catalog's hairline rather
+ * than boxed a second time inside the section's own border.
+ */
+.conflict-detail__blocks {
+  margin-block-start: var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.conflict-detail__block + .conflict-detail__block {
+  margin-block-start: var(--space-3);
+  padding-block-start: var(--space-3);
+  /* A divider inside the section's own border, which is the one place a sub-3:1
+     hairline is permitted. */
+  border-block-start: var(--border-width) solid var(--border);
+}
+
+/* The weekday and the clock range on one line, the weekday in a column wide enough
+   for the longest of the seven so the times start at the same place in every block. */
+.conflict-detail__when {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  line-height: var(--leading-tight);
+  color: var(--ink);
+}
+
+.conflict-detail__weekday {
+  flex: none;
+  min-width: 6rem;
+}
+
+/*
+ * The clock times in the tabular numeric column: tabular figures, so the ranges
+ * down the list line up and can be read as a column. The range reads left to right
+ * inside its line, so it keeps the figures and drops the right alignment, exactly
+ * as `.numeric--inline` does.
+ */
+.conflict-detail__times {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  white-space: nowrap;
+}
+
+/*
+ * The event summaries that produced the block, indented behind a hairline the way
+ * the Majors are indented under their College: they are a consequence of the block
+ * above them. This one sits inside the section's own border, so it is the divider
+ * token rather than the boundary one.
+ */
+.conflict-detail__summaries {
+  margin-block-start: var(--space-2);
+  margin-inline-start: var(--space-3);
+  padding: 0 0 0 var(--space-3);
+  border-inline-start: var(--border-width) solid var(--border);
+  list-style: none;
+}
+
+/*
+ * One summary per line. Requirement 15.6's untitled-event text occupies this same
+ * slot and takes this same treatment deliberately: it is what the summary says for
+ * an event with no title, so setting it apart would make an absent title look like
+ * a different kind of fact.
+ */
+.conflict-detail__summary {
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--ink);
+}
+
+.conflict-detail__summary + .conflict-detail__summary {
+  margin-block-start: var(--space-1);
+}

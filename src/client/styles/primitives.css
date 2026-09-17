@@ -1,0 +1,313 @@
+/*
+ * The identity primitives: the four reusable devices every view composes.
+ *
+ * These are the vocabulary of the visual system, so they are deliberately
+ * generic — no component name appears in this file, and no token is redefined
+ * here. The per-view stylesheets apply a device by putting its class on the
+ * element (the components already carry BEM class names; the devices are
+ * additive classes and data attributes, not replacements for them).
+ *
+ * The devices:
+ *   1. `.field-row`  — a labeled field row, at two densities
+ *      `.chip`       — the card-density form of a multi-value field
+ *   2. `.rail`       — a 3px left edge carrying the Conflict_State
+ *   3. `.numeric`    — a tabular-figure column for counts and clock ranges
+ *   4. `.rule` / `.surface` — the hairline rule and the flat bordered surface
+ *
+ * The identity is flat and motion-free: boundaries are hairlines rather than
+ * shadows, corners are 2px, and nothing here moves, grows, or shrinks on
+ * interaction. The only animated property in the whole system is a border
+ * color, and `--transition-duration` is already zeroed under
+ * `prefers-reduced-motion: reduce`.
+ */
+
+/* ------------------------------------------------ 1. labeled field row */
+
+/*
+ * One pattern at two densities, because the two surfaces ask different things of
+ * it. In the Team_Detail_View a field is read: the label sits above the value, in
+ * small caps with the letterspacing that face needs, and there is room for it. On
+ * a Team_Card a field is scanned, twenty-four at a time, and a label on its own
+ * line above a two-word value is most of the card's height — so the card density
+ * is inline and compact, and the label is plain sentence case at the label floor.
+ *
+ * Small-caps letterspaced labels therefore survive only at detail density. They
+ * were the treatment of nearly every label on the page, which is the larger half
+ * of the typography complaint; confining them to the one surface that reads as a
+ * record leaves them meaningful.
+ *
+ * Both densities share the label ink and the value ink, so a field learned in one
+ * place is still recognized in the other. `--ink-muted` clears 4.5:1 against the
+ * page field and against a card surface alike, in both themes, so the label is
+ * body-legible rather than decorative-legible.
+ *
+ * `.field-row` alone is the detail density, and `.field-row--detail` names it
+ * explicitly for markup that would rather say so; `.field-row--compact` is the
+ * card.
+ */
+.field-row {
+  display: flex;
+  flex-direction: column;
+  /* Tight inside the group; the air is spent between groups. */
+  gap: var(--space-1);
+  line-height: var(--leading-normal);
+}
+
+.field-row__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  line-height: var(--leading-tight);
+  color: var(--ink-muted);
+}
+
+.field-row__value {
+  color: var(--ink);
+}
+
+/*
+ * Detail density, stated as its own modifier. Identical to the bare device, so
+ * applying it changes nothing; it exists so a detail field can name its density
+ * beside a card field that names the other one.
+ */
+.field-row--detail {
+  flex-direction: column;
+}
+
+/*
+ * Card density: the label and the value on one line, wrapping to a second only
+ * when the value is too long for the track. `baseline` alignment so the label and
+ * the value sit on the same line however they differ in size, and the label never
+ * wraps on its own — a two-word label broken across lines is the density problem
+ * restated.
+ *
+ * No small caps and no letterspacing here, and the label is the same `--text-sm`
+ * as the value it labels, so the pair reads as one line of text with one word of
+ * it emphasized rather than as a heading with a body under it.
+ */
+.field-row--compact {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-tight);
+}
+
+.field-row--compact > .field-row__label {
+  flex: none;
+  font-variant-caps: normal;
+  letter-spacing: normal;
+  white-space: nowrap;
+}
+
+.field-row--compact > .field-row__value {
+  /* The value is what wraps and what may be broken, never the label. */
+  min-width: 0;
+}
+
+/*
+ * A chip: the card-density form of a multi-value field, where a stack of labeled
+ * lines would cost a line per value. One value per chip, on a wrapping row, each
+ * bounded so two values cannot be misread as one name — which is the job the
+ * one-value-per-line list was doing on the card.
+ *
+ * A chip is not interactive and is never the only carrier of anything: it is the
+ * same text the record holds, bounded. `.chip-list` takes the list markup's
+ * marker and indent off, so the row is chips rather than bullets.
+ */
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-block;
+  padding: 0 var(--space-2);
+  background: var(--surface-sunken);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-control);
+  font-size: var(--text-xs);
+  line-height: 1.6;
+  color: var(--ink);
+  /* A long single-word value breaks rather than widening the card's track. */
+  overflow-wrap: anywhere;
+}
+
+/* A value the record does not supply, or that cannot be selected, is stated in
+   the faint ink rather than omitted, so the row keeps its place in the column. */
+.field-row__value--faint {
+  color: var(--ink-faint);
+}
+
+/* Multi-value fields (colleges, majors) are lists in the markup; the device
+   removes the marker and the browser's indent without changing the type. */
+.field-row__value > ul,
+.field-row__value > ol,
+ul.field-row__value,
+ol.field-row__value {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ------------------------------------------------------- 2. state rail */
+
+/*
+ * A 3px left edge on a card or a panel, drawn only while a Busy_Schedule is
+ * loaded. Color is the whole of the device, and color is decoration only: the
+ * Conflict_State text that Requirement 11.11 requires is ordinary text inside the
+ * surface, and the rail neither replaces it nor is it ever the only thing that
+ * carries the state. Nothing here sets `content`, hides text, or shortens it.
+ *
+ * The state reaches the rail two ways, both driven by the `data-conflict`
+ * attribute the components already emit next to that text:
+ *   - `[data-conflict]` on the railed element itself, and
+ *   - `:has([data-conflict])`, for the common case where the attribute sits on
+ *     the state paragraph inside the card or panel that carries the rail.
+ *
+ * While no Busy_Schedule is loaded no `data-conflict` exists anywhere, and there
+ * is no rail: the edge collapses to the ordinary hairline the surface draws on its
+ * other three sides. Twenty-four cards each wearing a stripe that says nothing is
+ * noise, and it also spends the device's meaning before there is any state to
+ * spend it on — a rail on the page means a schedule is loaded, and its color means
+ * which state.
+ */
+.rail {
+  /* No schedule, no rail: the surface's own boundary, at the boundary width. */
+  --rail-edge-width: var(--border-width);
+  --rail-hue: var(--border-strong);
+  --rail-color: var(--rail-hue);
+  border-left: var(--rail-edge-width) solid var(--rail-color);
+  /* Hover saturates the rail; the width and the box are untouched. */
+  transition: border-color var(--transition-duration) linear;
+}
+
+/* A schedule is loaded, so there is a state to show: the edge widens to the rail
+   and takes the state's hue from one of the three rules below. */
+.rail[data-conflict],
+.rail:has([data-conflict]) {
+  --rail-edge-width: var(--rail-width);
+}
+
+.rail[data-conflict='clear'],
+.rail:has([data-conflict='clear']) {
+  --rail-hue: var(--state-clear);
+}
+
+.rail[data-conflict='unknown'],
+.rail:has([data-conflict='unknown']) {
+  --rail-hue: var(--state-unknown);
+}
+
+.rail[data-conflict='conflicting'],
+.rail:has([data-conflict='conflicting']) {
+  --rail-hue: var(--state-conflict);
+}
+
+/*
+ * Where a browser lacks `:has()`, no rail is drawn at all. That is a loss of
+ * decoration only — the state is still stated in text — which is the reason the
+ * rail was built as decoration in the first place.
+ */
+
+/* --------------------------------------------- 3. tabular numeric column */
+
+/*
+ * Facet counts, result counts, and clock ranges. Right-aligned tabular figures
+ * in the one UI face, so digits occupy equal advance widths and the numbers line
+ * up into a column that can be read down rather than scanned.
+ */
+.numeric {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  /* A count next to a label should never be the thing that wraps. */
+  white-space: nowrap;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* A clock range reads left to right inside running text, so it keeps the tabular
+   figures and drops the column alignment. */
+.numeric--inline {
+  text-align: left;
+}
+
+/* --------------------------------- 4. hairline rule and flat surface */
+
+/* The rule under a catalog entry: 1px, square, never text, and drawn in the
+   divider token rather than the boundary one — it separates, it does not bound. */
+.rule {
+  border: 0;
+  border-top: var(--border-width) solid var(--border);
+  border-radius: var(--radius-rule);
+  margin: 0;
+}
+
+/*
+ * The flat bordered surface: `--surface` on the page field, bounded by a 1px
+ * hairline, 2px corners, no shadow. Requirements 11.3 and 18.7 want a visible
+ * boundary at 3:1 regardless, so the border is the whole separation device and
+ * the elevation metaphor is dropped rather than layered on top of it. This is a
+ * card edge, so it takes `--border-strong`, which is the token held to that 3:1
+ * against every surface in both themes.
+ */
+.surface {
+  --surface-border: var(--border-strong);
+  background: var(--surface);
+  border: var(--border-width) solid var(--surface-border);
+  border-radius: var(--radius-surface);
+  box-shadow: none;
+  color: var(--ink);
+  transition: border-color var(--transition-duration) linear;
+}
+
+/*
+ * Hover darkens the border and saturates the rail. Both are color changes on
+ * borders that are already painted at their final width, so the surface does not
+ * move, resize, or reflow, and no neighboring content shifts under the pointer.
+ *
+ * Darkened toward the theme's own ink rather than switched to `--accent`: the
+ * accent is what a link is made of, and a card edge that turns indigo under the
+ * pointer claims to be one. Pulling the boundary token toward `--ink` reads as the
+ * same edge, stated more firmly, and it cannot fall below the 3:1 the boundary
+ * already clears in either theme, since it moves away from the surface behind it.
+ */
+.surface:hover {
+  --surface-border: color-mix(in srgb, var(--border-strong) 55%, var(--ink));
+}
+
+.rail:hover {
+  /* The state's own hue, pulled toward the ink: the same state, read louder. The
+     `--rail-hue` indirection keeps this one rule true for all four cases. */
+  --rail-color: color-mix(in srgb, var(--rail-hue) 80%, var(--ink));
+}
+
+/*
+ * A railed surface takes the rail on the left and the hairline on its other
+ * three sides, so the rail reads as the card's own edge rather than as a stripe
+ * sitting next to one.
+ */
+.surface.rail {
+  /* `.surface` sets all four borders, so the rail's own edge is restated here.
+     With no schedule loaded that edge is the surface's own hairline, in the
+     surface's own boundary color, so the card is bounded identically on all four
+     sides and no rail is visible. */
+  border-left: var(--rail-edge-width) solid var(--rail-color);
+}
+
+.surface.rail:not([data-conflict]):not(:has([data-conflict])) {
+  --rail-color: var(--surface-border);
+}
+
+/*
+ * There is no `prefers-contrast: more` override left in this file. With no
+ * schedule loaded the rail is the surface's own boundary, which the contrast
+ * override in `tokens.css` already collapses onto `--ink` and thickens, and the
+ * three loaded states keep their own colors: they are decoration, and the text
+ * that carries the state is unaffected.
+ */

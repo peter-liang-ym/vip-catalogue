@@ -386,8 +386,26 @@ export function App({ fetch: fetchImpl, now: nowImpl, store }: AppProps = {}) {
    * the Source_Site link are on every page, including the not-found page and a
    * failed load (Requirements 9.5, 10.2, 12.6).
    */
-  const chrome = (children: ComponentChildren) => (
-    <SiteChrome listingHref={listingHref} onListing={showListing}>
+  const chrome = (
+    children: ComponentChildren,
+    /**
+     * Whether the masthead carries the search field. The listing is the one route
+     * with a Search_Query to type into, so the field is offered there and nowhere
+     * else; the handler is the same debounced, replacing write it always was
+     * (Requirement 8.8).
+     */
+    searchable = false,
+  ) => (
+    <SiteChrome
+      listingHref={listingHref}
+      onListing={showListing}
+      // The Theme_Preference is device state like the Busy_Schedule, so it comes
+      // from the same injected storage and is likewise never encoded
+      // (Requirements 18.9, 8.9).
+      store={store}
+      query={qs.query}
+      onQuery={searchable ? setQuery : undefined}
+    >
       {children}
     </SiteChrome>
   );
@@ -440,27 +458,35 @@ export function App({ fetch: fetchImpl, now: nowImpl, store }: AppProps = {}) {
         view={view}
         qs={qs}
         calendar={calendar}
-        onQuery={setQuery}
         onCommit={commit}
         onCalendarState={setCalendar}
         onOpenTeam={openTeam}
         calendarStore={store}
       />
     </>,
+    // The listing is the route with a Search_Query, so its masthead carries the
+    // search field.
+    true,
   );
 }
 
 /** Requirement 12.4: the loading indicator, and no cards, message, or retry. */
 function Loading() {
-  return <p role="status">Loading teams…</p>;
+  return (
+    <p class="dataset-loading notice" role="status">
+      Loading teams…
+    </p>
+  );
 }
 
 /** Requirements 12.5, 12.6: the failure message and a retry control. */
 function LoadFailure({ onRetry }: { readonly onRetry: () => void }) {
   return (
-    <div>
-      <p role="alert">The team data failed to load.</p>
-      <button type="button" onClick={onRetry}>
+    <div class="load-failure">
+      <p class="load-failure__message notice" role="alert">
+        The team data failed to load.
+      </p>
+      <button class="load-failure__retry" type="button" onClick={onRetry}>
         Try again
       </button>
     </div>

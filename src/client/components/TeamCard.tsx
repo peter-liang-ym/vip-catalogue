@@ -23,6 +23,36 @@ import { highlight } from '../highlight';
 /** Requirement 4.2: a card shows at most this much of the goals text. */
 export const GOALS_EXCERPT_LENGTH = 200;
 
+/** The one character Requirement 4.2's excerpt ends with when it is a cut. */
+const ELLIPSIS = '…';
+
+/**
+ * Requirement 4.2's goals excerpt: the whole goals text when it fits, and
+ * otherwise the longest prefix that ends on a word boundary inside the bound,
+ * followed by an ellipsis.
+ *
+ * The ellipsis is budgeted out of the 200 characters rather than added to them,
+ * so the excerpt is at most 200 characters including it.
+ *
+ * The truncation is the text this function returns, not a CSS effect: the card's
+ * three-line clamp is a second, visual bound over an already-bounded string, so a
+ * render with no stylesheet still shows bounded text.
+ *
+ * A goals text with no whitespace inside the bound — one unbroken 200-character
+ * run — has no word boundary to end on, and then the cut is where the bound is:
+ * some excerpt is more useful than none, and the ellipsis still says it is a cut.
+ */
+export function goalsExcerpt(goals: string): string {
+  if (goals.length <= GOALS_EXCERPT_LENGTH) return goals;
+
+  const bounded = goals.slice(0, GOALS_EXCERPT_LENGTH - ELLIPSIS.length);
+  /* Drop the trailing run of non-whitespace, which is the word the bound fell
+     inside, together with the whitespace before it. */
+  const toBoundary = bounded.replace(/\s+\S*$/u, '');
+
+  return `${(toBoundary === '' ? bounded : toBoundary).trimEnd()}${ELLIPSIS}`;
+}
+
 /**
  * The Conflict_State as text (Requirements 15.4, 11.11). Text, not color, is what
  * carries the state, and being ordinary card text is what exposes it to assistive
@@ -106,21 +136,43 @@ export function TeamCard({
    */
   const hasImage = team.imagePath !== '';
   const colleges = distinctColleges(team);
-  const goals = team.goals.slice(0, GOALS_EXCERPT_LENGTH);
+  const goals = goalsExcerpt(team.goals);
   const { day, time } = team.meeting;
 
+  /**
+   * The placeholder's one character: the team's first, upper-cased. Split by code
+   * point so a name beginning with an astral character is not halved. The name is
+   * never empty in a valid Dataset, so this is a character in practice, but an
+   * empty string renders an empty placeholder rather than throwing.
+   */
+  const initial = ([...team.name.trim()][0] ?? '').toUpperCase();
+
   return (
-    <article class="team-card">
+    // `surface rail` are the identity primitives: the flat bordered surface, and
+    // the 4px left edge that takes its color from the `data-conflict` attribute on
+    // the Conflict_State paragraph below. Both are decoration over the same
+    // markup — the state is text either way (Requirement 11.11).
+    <article class="team-card surface rail">
       {hasImage &&
         (imageFailed ? (
           // Requirement 10.8: the placeholder stands in for the image and every
-          // other field of the record still renders.
+          // other field of the record still renders. It carries the team's first
+          // character rather than being an empty bordered box, so a card whose
+          // image is missing still shows something at image size.
+          //
+          // The character is decoration: `role="img"` with the record's alt text
+          // is the accessible name of this element, so the letter is never read
+          // out and is hidden from assistive technology explicitly.
           <div
             class="team-card__image team-card__image--placeholder"
             role="img"
             aria-label={alt}
             data-testid="team-card-image-placeholder"
-          />
+          >
+            <span class="team-card__initial" aria-hidden="true">
+              {initial}
+            </span>
+          </div>
         ) : (
           <img
             class="team-card__image"
@@ -156,9 +208,17 @@ export function TeamCard({
       )}
 
       {colleges.length > 0 && (
-        <ul class="team-card__colleges" data-testid="team-card-colleges">
+        // Chips on one wrapping row rather than a labeled list: at card density a
+        // label on its own line above a stack of one College per line is most of
+        // the card's height. Each chip is bounded, which is the job the
+        // one-per-line list was doing — two Colleges cannot be read as one name —
+        // and the label goes because a College name says which field it is.
+        <ul
+          class="team-card__colleges chip-list"
+          data-testid="team-card-colleges"
+        >
           {colleges.map(college => (
-            <li key={college}>
+            <li key={college} class="chip">
               <Highlighted text={college} terms={terms} />
             </li>
           ))}
@@ -167,7 +227,9 @@ export function TeamCard({
 
       {(day !== '' || time !== '') && (
         <p class="team-card__meeting" data-testid="team-card-meeting">
-          <span class="team-card__meeting-label">Meets</span>{' '}
+          {/* `field-row__label` is the shared field-label face, so `Meets` here
+              and a field label in the Team_Detail_View read identically. */}
+          <span class="team-card__meeting-label field-row__label">Meets</span>{' '}
           {day !== '' && <Highlighted text={day} terms={terms} />}
           {day !== '' && time !== '' && ' '}
           {time !== '' && <Highlighted text={time} terms={terms} />}

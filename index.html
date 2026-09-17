@@ -10,6 +10,37 @@
     -->
     <base href="/" />
     <title>VIP Teams Mirror (unofficial)</title>
+    <!--
+      Requirement 18.8: the Resolved_Theme is applied before the page is first
+      rendered, so no part of it paints in the other color scheme. The Preact
+      bundle runs after first paint and so cannot do this; this script can,
+      because it is synchronous and in the head.
+
+      It reads the same `vipmirror.theme` key, in the same shape and at the same
+      storage version, as `src/client/themeStore.ts`, and sets `data-theme` only
+      for a value that key can actually hold — anything else leaves the attribute
+      unset, which `tokens.css` treats as "follow `prefers-color-scheme`", and
+      which is the `system` the store resolves such a value to. The bundle then
+      re-asserts the setting it loaded rather than re-deciding it.
+
+      Everything is inside `try`/`catch`: a browser with storage disabled throws
+      on the `localStorage` lookup itself, and a theme is not worth a blank page.
+    -->
+    <script>
+      try {
+        var stored = JSON.parse(localStorage.getItem('vipmirror.theme'));
+        if (
+          stored !== null &&
+          typeof stored === 'object' &&
+          stored.storageVersion === '1' &&
+          (stored.theme === 'light' ||
+            stored.theme === 'dark' ||
+            stored.theme === 'system')
+        ) {
+          document.documentElement.dataset.theme = stored.theme;
+        }
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="app"></div>

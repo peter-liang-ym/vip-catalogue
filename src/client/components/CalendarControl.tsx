@@ -1,13 +1,13 @@
 /**
  * The Calendar_File control: file selection, the drop target, the two checks that
- * happen before any parse, the lazily imported parser, and the removal control
- * (Requirements 14.1, 14.2, 14.3, 14.4, 11.10, 17.4, 17.9).
+ * happen before any parse, and the lazily imported parser
+ * (Requirements 14.1, 14.2, 14.3, 14.4, 11.10, 17.9).
  *
- * Removal lives here rather than beside the status display because Requirement
- * 17.9 states, adjacent to this control, that the file can be removed, and the
- * control that keeps that promise belongs where the promise is made. It is the
- * mirror of `supply`: one activation, one terminal `onState`, and the same
- * injected `store`.
+ * The removal control is `CalendarDisclosure`'s, beside the one-line summary of
+ * what is loaded. Requirement 17.9 states, adjacent to this control, that the file
+ * can be removed, and the summary is adjacent to it inside the same disclosure —
+ * whereas a second removal control here would be unreachable exactly when the
+ * disclosure is collapsed, which is the state a loaded schedule leaves it in.
  *
  * One `input[type=file]` inside a container that also accepts a dropped file, so
  * both ways of supplying a Calendar_File named in Requirement 14.1 reach the same
@@ -16,6 +16,11 @@
  * it a `label`-associated name for free (Requirement 11.10). `dragover` is
  * prevented for the one reason it has to be — a target that does not cancel it
  * never receives the `drop`.
+ *
+ * `data-drop-active` marks the target while a drag is over it, so the styles can
+ * show which area the file would land in. It is presentation only: no behavior
+ * reads it, the drop hint states that a file can be dragged here whether or not one
+ * is being dragged, and there is no CSS selector for a drag over an element.
  *
  * Two rejections happen here, before the parser is even fetched: a file that is
  * neither named `.ics` nor declared as calendar content, and a file over the 5 MB
@@ -49,10 +54,10 @@
  * test without a network, a real clock, or `localStorage`.
  */
 
+import { useState } from 'preact/hooks';
 import type { CalendarClock } from '../calendar/parseCalendar';
 import {
   applyParseResult,
-  removeCalendar,
   scheduleOf,
   type CalendarNotice,
   type CalendarState,
@@ -115,14 +120,6 @@ export const TOO_LARGE_MESSAGE =
  */
 export const PRIVACY_STATEMENT =
   'Your calendar file is read on your device. It is not uploaded anywhere, and you can remove it at any time.';
-
-/**
- * Requirement 17.4: the control that removes the loaded and the stored
- * Busy_Schedule. A `button` whose text content is its accessible name, so it is in
- * the tab order, activatable by keyboard, and named without anything of ours
- * (Requirement 11.10).
- */
-export const REMOVE_CALENDAR_LABEL = 'Remove your loaded calendar';
 
 /** What the busy affordance says while the chunk downloads and the parse runs. */
 export function busyText(fileName: string): string {
@@ -232,6 +229,9 @@ export function CalendarControl({
   store,
   yieldToPaint = yieldToEventLoop,
 }: CalendarControlProps) {
+  /** Whether a drag is currently over the target; read by the styles only. */
+  const [dropActive, setDropActive] = useState(false);
+
   /**
    * Everything one supplied file does, from the two pre-parse checks through the
    * chunk import to the finished `CalendarState`. Every path ends in exactly one
@@ -306,19 +306,30 @@ export function CalendarControl({
 
   const notice =
     state.kind === 'error' ? controlNoticeMessage(state.notice) : null;
-  // Requirement 17.4: the removal control is offered while a Busy_Schedule is
-  // loaded, and there is nothing to remove when none is (Requirement 17.6).
-  const loaded = scheduleOf(state) !== null;
 
   return (
     <div
       class="calendar-control"
       data-testid="calendar-control"
+      data-drop-active={dropActive ? '' : undefined}
       // Requirement 14.1: a target that does not cancel `dragover` never gets the
-      // `drop`, which is the only reason this handler exists.
-      onDragOver={event => event.preventDefault()}
+      // `drop`, which is the only reason this handler is required. `dragover`
+      // repeats while the drag is over the target, and setting the flag it already
+      // holds re-renders nothing.
+      onDragOver={event => {
+        event.preventDefault();
+        setDropActive(true);
+      }}
+      // `dragleave` also fires when the drag crosses between this target's own
+      // children, so only a departure to something outside it clears the flag.
+      onDragLeave={event => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setDropActive(false);
+        }
+      }}
       onDrop={event => {
         event.preventDefault();
+        setDropActive(false);
 
         const file = event.dataTransfer?.files[0];
         if (file !== undefined) void supply(file);
@@ -354,27 +365,10 @@ export function CalendarControl({
         {DROP_HINT_TEXT}
       </p>
 
-      {loaded && (
-        // Requirements 17.4, 17.9: removal is offered beside the control that
-        // took the file, which is where the privacy statement promises it. One
-        // click clears storage and returns `none`, and the shell re-deriving
-        // against no schedule is what removes every Conflict_State, every
-        // Conflict_Detail, and the excluded count. Nothing here reads or writes
-        // the Query_State, so the toggle setting survives (Requirement 17.5).
-        <button
-          class="calendar-control__remove"
-          type="button"
-          data-testid="calendar-remove"
-          onClick={() => onState(removeCalendar(store))}
-        >
-          {REMOVE_CALENDAR_LABEL}
-        </button>
-      )}
-
       {state.kind === 'parsing' && (
         // Keyboard-focusable, so the busy state is reachable without a pointer.
         <p
-          class="calendar-control__busy"
+          class="calendar-control__busy notice"
           role="status"
           aria-busy="true"
           tabIndex={0}
@@ -388,7 +382,7 @@ export function CalendarControl({
         // A file the visitor just supplied was rejected, so the message is
         // announced rather than left to be noticed.
         <p
-          class="calendar-control__notice"
+          class="calendar-control__notice notice"
           role="alert"
           data-testid="calendar-control-notice"
         >

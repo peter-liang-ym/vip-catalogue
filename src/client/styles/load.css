@@ -1,0 +1,125 @@
+/*
+ * The two Dataset load states the shell renders in place of a view: the loading
+ * indicator (Requirement 12.4) and the load-failure block with its retry control
+ * (Requirements 12.5, 12.6).
+ *
+ * A per-view stylesheet, so it consumes tokens and composes the devices and defines
+ * neither. The inline gutter is `layout.css`, and the focus ring, the 24px target
+ * floor, and the control padding are `controls.css`; the surface, the boundary, the
+ * ink, and the measure of both messages are the shared `.notice` in `base.css`,
+ * which both carry in the markup alongside their own class. Nothing here restates or
+ * cancels any of them, which is why this file is as short as it is: two messages in
+ * the site's one notice style, and one control.
+ *
+ * Both states are absences as much as presences, and the absences are the shell's
+ * doing rather than this file's: `app.tsx` returns one of these instead of the
+ * listing, so while loading there is no Team_Card, no failure message, and no retry
+ * control to hide, and on failure there is no card to suppress. No rule below sets
+ * `display: none` on anything, because there is nothing rendered for it to hide.
+ *
+ * What this file does say is that neither state disturbs what surrounds it. The
+ * chrome — the masthead, the site navigation, and the footer attribution that
+ * Requirement 12.6 keeps on a failed load — is styled once in `base.css` and is not
+ * touched here, and neither block is positioned, fixed, or overlaid, so nothing
+ * covers the navigation or the footer. The address bar is untouched for the same
+ * kind of reason: the Query_State lives in the history entry the shell declines to
+ * rewrite on a failed load, and a stylesheet has no part in it.
+ *
+ * Both states are motion-free: no spinner, no pulse, no skeleton, nothing to
+ * disable under `prefers-reduced-motion`. The only animated property is the retry
+ * control's border color, at `--transition-duration`, which `tokens.css` already
+ * zeroes under `prefers-reduced-motion: reduce` — the same treatment every hover in
+ * the system gets. The text is the whole of the indication in either state, which is
+ * also what makes the states legible to a visitor who cannot see them.
+ */
+
+/* --------------------------------------------------------- the loading state */
+
+/*
+ * Requirement 12.4. One line of text carrying `role="status"` and the shared notice
+ * style: the flat bordered surface, sized by its own text, inset by the gutter like
+ * the freshness notices, in the normal flow between the masthead and the footer. No
+ * thickened edge, because the rail means a Busy_Schedule is loaded and this message
+ * is not about one.
+ *
+ * This rule adds the block margins that set it apart from the chrome above and
+ * below, and the 24px `min-height` — the same floor the calendar's busy affordance
+ * takes, so a one-line indication is not a thinner band than the notices a visitor
+ * sees elsewhere.
+ */
+.dataset-loading {
+  margin-block: var(--space-6) var(--space-10);
+  min-height: var(--space-6);
+  line-height: var(--leading-tight);
+}
+
+/* --------------------------------------------------------- the failure state */
+
+/*
+ * Requirements 12.5, 12.6. The message and the control that retries, stacked in the
+ * normal flow between the masthead and the footer, both of which keep their rules
+ * from `base.css`.
+ *
+ * The wrapper draws nothing. The message carries the boundary, because it is a
+ * notice like every other failure message on the site, and a bordered block around a
+ * bordered notice would be two edges saying one thing. `align-items: flex-start`
+ * keeps both children sized by their own text rather than stretched across the
+ * column, which is what leaves the retry reading as a button rather than as a band.
+ */
+.load-failure {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-block: var(--space-6) var(--space-10);
+}
+
+/*
+ * Requirement 12.6's message, in the shared notice style with one step up in size:
+ * it is the reason the catalog is not on the page, so it is the largest notice on the
+ * site rather than one more advisory line. It states what happened rather than
+ * titling the page, so it stays a paragraph in full-contrast ink and takes no heading
+ * treatment. The 80ch measure comes from `.notice`.
+ */
+.load-failure__message {
+  font-size: var(--text-md);
+}
+
+/*
+ * Requirement 12.5's retry control, set as the primary action: the one thing on the
+ * page worth doing, so it is the one filled control in the whole identity. An `--ink`
+ * fill with the page field as its ink is the theme's own maximum contrast either way
+ * round — light or dark, the pairing inverts and the ratio holds — and an `--ink`
+ * boundary clears 11.3's 3:1 against the field behind it several times over, so the
+ * fill is an emphasis rather than the only signal. The control is also the only
+ * button on the page and it names its own action.
+ *
+ * Small caps is the same treatment the catalog's action buttons take, one size up, so
+ * the control reads as this site's button rather than as a platform default. The
+ * border, the padding, and the 24px target floor come from `controls.css`; only the
+ * fill, the ink, and the border color are set here.
+ */
+.load-failure__retry {
+  --control-border: var(--ink);
+  padding: var(--space-2) var(--space-5);
+  background: var(--ink);
+  color: var(--bg);
+  font-size: var(--text-base);
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.06em;
+  line-height: var(--leading-tight);
+  transition: border-color var(--transition-duration) linear;
+}
+
+/*
+ * The hover and focus affordance is an accent edge on the filled control: the border
+ * color changes and nothing else does, so the control neither moves nor resizes and
+ * nothing below it reflows. The fill is unchanged, so the label's contrast is the
+ * same whether a pointer is over it or not, and the focus ring `controls.css` draws
+ * is unaffected.
+ */
+.load-failure__retry:hover,
+.load-failure__retry:focus-visible {
+  --control-border: var(--accent);
+}

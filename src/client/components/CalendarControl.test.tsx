@@ -10,7 +10,6 @@ import {
 import { useState } from 'preact/hooks';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { BusySchedule } from '../../shared/types';
-import { BUSY_SCHEDULE_KEY, saveStoredSchedule } from '../busyScheduleStore';
 import { parseCalendar } from '../calendar/parseCalendar';
 import { NO_CALENDAR, scheduleOf, type CalendarState } from '../calendarState';
 import {
@@ -21,7 +20,6 @@ import {
   MAX_CALENDAR_BYTES,
   PRIVACY_STATEMENT,
   rejectionOf,
-  REMOVE_CALENDAR_LABEL,
   TOO_LARGE_MESSAGE,
   WRONG_TYPE_MESSAGE,
   type CalendarControlProps,
@@ -338,43 +336,8 @@ describe('CalendarControl', () => {
     });
   });
 
-  it('offers no removal control while no Busy_Schedule is loaded (Requirement 17.6)', () => {
-    mount();
-
-    expect(screen.queryByTestId('calendar-remove')).toBeNull();
-  });
-
-  it('removes the loaded and the stored Busy_Schedule (Requirements 17.4, 11.10)', () => {
-    const store = new MemoryStorage();
-    const schedule = loadedSchedule();
-    saveStoredSchedule(schedule, store);
-    const { states } = mount({
-      state: { kind: 'loaded', schedule, persisted: true, notice: null },
-      store,
-    });
-
-    // The accessible name is the button's own text (Requirement 11.10).
-    const remove = screen.getByRole('button', { name: REMOVE_CALENDAR_LABEL });
-    fireEvent.click(remove);
-
-    // `none` withdraws the schedule, which is what clears every Conflict_State,
-    // every Conflict_Detail, and the excluded count where they are derived.
-    expect(states).toEqual([NO_CALENDAR]);
-    expect(store.getItem(BUSY_SCHEDULE_KEY)).toBeNull();
-    expect(screen.queryByTestId('calendar-remove')).toBeNull();
-  });
-
-  it('keeps offering removal while a rejected file leaves a schedule loaded (Requirement 17.4)', () => {
-    mount({
-      state: {
-        kind: 'error',
-        notice: 'invalidCalendar',
-        schedule: loadedSchedule(),
-      },
-    });
-
-    expect(screen.getByTestId('calendar-remove')).toBeTruthy();
-  });
+  // Removal is `CalendarDisclosure`'s control now, beside the summary of what is
+  // loaded, and is covered in that component's suite (Requirements 17.4, 17.6).
 
   it('does not fetch the parser for a rejected file (Requirements 14.3, 14.4)', () => {
     let calls = 0;
